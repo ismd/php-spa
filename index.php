@@ -24,10 +24,6 @@ require SITEPATH . 'engine' . DIRSEP . 'startup.php';
 // Registry, в котором будем хранить глобальные значения
 $registry = new Registry;
 
-// Подключаемся к базе данных
-// TODO: перенести куда-нибудь отсюда подключение
-@mysql_connect('localhost', 'root', '123') && mysql_select_db('ismd_forsbs') || $registry['db_error'] = true;
-
 // Загружаем router
 $router = new Router($registry);
 $registry['router'] = $router;

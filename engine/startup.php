@@ -22,4 +22,8 @@ function __autoload($className) {
 
     return false;
 }
+
+// Подключаемся к базе данных
+if (!(mysql_connect('localhost', 'root', '123') && mysql_select_db('game')))
+    $registry['db_error'] = true;
 ?>
