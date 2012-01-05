@@ -26,7 +26,7 @@ $registry = new Registry;
 
 // Подключаемся к базе данных
 // TODO: перенести куда-нибудь отсюда подключение
-@mysql_connect('localhost', 'root', '123') && mysql_select_db('game') || $registry['db_error'] = true;
+@mysql_connect('localhost', 'root', '123') && mysql_select_db('ismd_forsbs') || $registry['db_error'] = true;
 
 // Загружаем router
 $router = new Router($registry);
@@ -38,4 +38,5 @@ $registry['template'] = $template;
 
 // Выбираем нужный контроллер, определяем действие и выполняем
 $router->delegate();
+$router->showTemplate();
 ?>

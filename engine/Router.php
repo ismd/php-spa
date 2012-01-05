@@ -6,20 +6,26 @@
 class Router {
 
     private $registry;
-    private $path;
+    private $rootpath;
     private $controller;
     private $action;
 
-    public function __construct($registry) {
+    // Уровень текущей вложенности роутера
+    private $level = 0;
+
+    public function __construct($registry, $rootpath = '') {
         $this->registry = $registry;
 
+        if ($rootpath != '')
+            $this->level = substr_count($rootpath, '/') + 1;
+
         // Путь к директории с контроллерами и моделями
-        $path = SITEPATH . 'engine' . DIRSEP . 'modules' . DIRSEP;
+        $path = SITEPATH . 'engine' . DIRSEP . 'modules' . ($rootpath != '' ? DIRSEP . $rootpath : '');
 
         if (!is_dir($path))
             die("Не могу найти директорию с движком игры.");
 
-        $this->path = $path;
+        $this->rootpath = $path;
     }
 
     /**
@@ -29,11 +35,11 @@ class Router {
         // Анализируем путь
         $this->getController();
 
-        $controllerFile = $this->path . $this->controller . 'Controller.php';
-        $modelFile = $this->path . $this->controller . 'Model.php';
+        $controllerFile = $this->rootpath . DIRSEP . $this->controller . 'Controller.php';
+        $modelFile = $this->rootpath . DIRSEP . $this->controller . 'Model.php';
 
         // Если не доступен файл контроллера
-        if (!file_exists($controllerFile) || !is_readable($controllerFile)) {
+        if (!is_readable($controllerFile)) {
             header('Location: /');
             die;
         }
@@ -42,7 +48,7 @@ class Router {
         require $controllerFile;
 
         // Подключаем модель, если есть
-        if (file_exists($modelFile) && is_readable($modelFile)) {
+        if (is_readable($modelFile)) {
             require $modelFile;
 
             $class = $this->controller . 'Model';
@@ -60,31 +66,35 @@ class Router {
         $action = $this->action;
 
         // Действие доступно?
-        if (!is_callable(array($controller, $action)))
-            $action = 'index';
+        if (!is_callable(array($controller, $action))) {
+            header('Location: /' . strtolower($this->controller));
+            die;
+        }
 
         // Выполняем действие
-        $controller->$action();
+        $controller->$action($this->registry['args']);
+    }
 
-        // Определяем массив последовательных действий
-        $action = array();
-        $action[] = $this->action;
-
-        if (!empty($this->registry['subaction']))
-            $action[] = $this->registry['subaction'];
-        
-        // Выводим шаблон
-        $this->registry['template']->show(strtolower($this->controller), $action);
+    public function showTemplate() {
+        $this->registry['template']->show();
     }
 
     /**
      * Определяем контроллер и действие
      */
     private function getController() {
-        $route = (empty($_GET['route'])) ? 'index' : $_GET['route'];
+        if (empty($_GET['route']))
+            $route = 'index';
+        else {
+            $route = explode('/', $_GET['route']);
+
+            for ($i = 0; $i < $this->level; $i++)
+                unset($route[$i]);
+
+            $route = trim(implode('/', $route), '/');
+        }
 
         // Получаем раздельные части
-        $route = trim($route, '/');
         $parts = explode('/', $route);
 
         // Делаем первую букву заглавной

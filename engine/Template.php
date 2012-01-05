@@ -4,9 +4,10 @@
  */
 
 class Template implements ArrayAccess {
-    
+
     private $registry;
     private $data = array();
+    private $ownHeaderFooter = false;
 
     public function __construct($registry) {
         $this->registry = $registry;
@@ -38,7 +39,7 @@ class Template implements ArrayAccess {
 
     /**
      * Удалить переменную
-     * 
+     *
      * @param string $varname - имя
      */
     public function remove($key) {
@@ -66,59 +67,75 @@ class Template implements ArrayAccess {
 
     /**
      * Загружаем нужный шаблон
-     *
-     * @param string $controller - имя контроллера
-     * @param array $action - имена действий
      */
-    public function show($controller, $action) {
+    public function show() {
         // Чтобы было удобней обращаться к переменным шаблона из самого шаблона
-        $template = $this;
+        $data = $this->data;
 
-        $f = SITEPATH . 'templates' . DIRSEP;
+        $getRoute = (empty($_GET['route'])) ? 'index' : str_replace('/', DIRSEP, trim($_GET['route'], '/'));
 
-        // Подключаем главный header
-        $filename = $f . 'header.php';
+        if ($this->ownHeaderFooter) {
+            $path = SITEPATH . 'templates' . DIRSEP .  $getRoute . DIRSEP;
+            $filename = substr($path, 0, -strlen(DIRSEP)) . '.php';
+            $path1 = strrev(strstr(strrev($filename), DIRSEP));
 
-        if (file_exists($filename) && is_readable($filename))
-            require $filename;
+            if (is_readable($filename)) {
+                if (is_readable($path1 . 'header.php'))
+                    require $path1 . 'header.php';
 
-        // Подключаем header контроллера
-        $f .= $controller . DIRSEP;
-        $filename = $f . 'header.php';
-        
-        if (file_exists($filename) && is_readable($filename))
-            require $filename;
-
-        // Подключаем последующие header'ы
-        $countAction = count($action);
-        for ($i = 0; $i < $countAction - 1; $i++) {
-            $f .= $action[$i] . DIRSEP;
-            $filename = $f . 'header.php';
-
-            if (file_exists($filename) && is_readable($filename))
                 require $filename;
+
+                if (is_readable($path1 . 'footer.php'))
+                    require $path1 . 'footer.php';
+            }
+
+            if (is_readable($path . 'header.php'))
+                require $path . 'header.php';
+
+            if (is_readable($path . 'index.php'))
+                require $path . 'index.php';
+
+            if (is_readable($path . 'footer.php'))
+                require $path . 'footer.php';
+
+            return;
         }
 
-        // Подключаем сам файл шаблона
-        $filename = $f . $action[$countAction-1] . '.php';
+        $route = $getRoute . DIRSEP;
+        $path = SITEPATH . 'templates' . DIRSEP;
+        $countRoute = substr_count($route, DIRSEP) + 1;
 
-        if (file_exists($filename) && is_readable($filename))
-            require $filename;
-        else
-            die('404 Not Found');
+        // Подключаем последовательно header'ы
+        for ($i = 0; $i < $countRoute; $i++) {
+            if (is_readable($path . 'header.php'))
+                require $path . 'header.php';
+
+            $path .= strstr($route, DIRSEP, true) . DIRSEP;
+            $route = substr(strstr($route, DIRSEP), strlen(DIRSEP));
+        }
+
+        $path = substr($path, 0, -strlen(DIRSEP));
+
+        // Подключаем сам нужный шаблон
+        if (is_readable($path . 'index.php'))
+            require $path . 'index.php';
 
         // Подключаем footer'ы в обратном порядке
-        // $i < $countAction + 1, потому что сразу подключаем footer контроллера и главный footer
-        for ($i = 0; $i < $countAction + 1; $i++) {
-            $filename = $f . 'footer.php';
+        $route = $getRoute . DIRSEP;
+        $path = SITEPATH . 'templates' . DIRSEP . $route;
 
-            if (file_exists($filename) && is_readable($filename))
-                require $filename;
+        for ($i = 0; $i < $countRoute; $i++) {
+            if (is_readable($path . 'footer.php'))
+                require $path . 'footer.php';
 
-            $f = substr(strrev($f), strlen(DIRSEP));
-            $f = strstr($f, DIRSEP);
-            $f = strrev($f);
+            $path = substr(strrev($path), strlen(DIRSEP));
+            $path = strstr($path, DIRSEP);
+            $path = strrev($path);
         }
+    }
+
+    public function ownHeaderFooter($value = false) {
+        $this->ownHeaderFooter = $value;
     }
 }
 ?>

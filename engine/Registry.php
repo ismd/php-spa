@@ -5,7 +5,7 @@
  */
 
 class Registry implements ArrayAccess {
-    
+
     private $data = array();
 
     /**
@@ -15,8 +15,8 @@ class Registry implements ArrayAccess {
      * @param mixed $var - значение
      */
     public function set($key, $value) {
-        if (isset($this->data[$key]))
-            echo "Переменная `" . $key . "' уже установлена.";
+        /*if (isset($this->data[$key]))
+          echo "Переменная `" . $key . "' уже установлена.";*/
 
         $this->data[$key] = $value;
     }
