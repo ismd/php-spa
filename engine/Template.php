@@ -10,6 +10,7 @@ class Template implements ArrayAccess {
     private $ownHeaderFooter = false;
     private $js = array();
     private $css = array();
+    private $title = '';
 
     public function __construct($registry) {
         $this->registry = $registry;
@@ -152,6 +153,10 @@ class Template implements ArrayAccess {
             $this->css = array_merge($this->css, $link);
         else
             $this->css[] = $link;
+    }
+
+    public function title($title) {
+        $this->title = '::' . $title;
     }
 }
 ?>
