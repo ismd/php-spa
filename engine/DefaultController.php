@@ -18,6 +18,6 @@ abstract class DefaultController {
     /**
      * Обязательное действие index у всех контроллеров (страница по-умолчанию)
      */
-    abstract public function index();
+    abstract public function index($args = null);
 }
 ?>
