@@ -63,6 +63,26 @@ class Router {
         else
             $controller = new $class($this->registry);
 
+        // Подключаем нужные контроллеру модели
+        $requiredModels = $controller->requiredModels();
+        foreach ($requiredModels as $status => $reqModel) {
+            $reqModel = explode('/', $reqModel);
+            $countReqModel = count($reqModel);
+            $reqModel[$countReqModel - 1] = ucfirst($reqModel[$countReqModel - 1]);
+            $reqModel = implode('/', $reqModel);
+
+            $filename = SITEPATH . 'engine' . DIRSEP . 'modules' . DIRSEP . $reqModel . 'Model.php';
+
+            if (is_readable($filename)) {
+                require_once $filename;
+
+                if ($status == 'main') {
+                    $class = $reqModel . 'Model';
+                    $controller->setModel(new $class($this->registry));
+                }
+            }
+        }
+
         $action = $this->action;
 
         // Действие доступно?
