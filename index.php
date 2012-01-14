@@ -10,9 +10,6 @@ error_reporting (E_ALL);
 
 session_start();
 
-// delete !!!
-//unset($_SESSION['current_game']);
-
 define ('DIRSEP', DIRECTORY_SEPARATOR);
 
 // Определяем директорию с сайтом
