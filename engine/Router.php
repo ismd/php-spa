@@ -118,7 +118,7 @@ class Router {
         $parts = explode('/', $route);
 
         // Делаем первую букву заглавной
-        $parts[0][0] = strtoupper($parts[0][0]);
+        $parts[0] = ucfirst($parts[0]);
 
         $controller = $parts[0];
         $action = (empty($parts[1])) ? 'index' : $parts[1];
