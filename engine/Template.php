@@ -75,12 +75,12 @@ class Template implements ArrayAccess {
         // Чтобы было удобней обращаться к переменным шаблона из самого шаблона
         $data = $this->data;
 
-        $getRoute = (empty($_GET['route'])) ? 'index' : str_replace('/', DIRSEP, trim($_GET['route'], '/'));
+        $getRoute = (empty($_GET['route'])) ? 'index' : trim($_GET['route'], '/');
 
         if ($this->ownHeaderFooter) {
-            $path = SITEPATH . 'templates' . DIRSEP .  $getRoute . DIRSEP;
-            $filename = substr($path, 0, -strlen(DIRSEP)) . '.phtml';
-            $path1 = strrev(strstr(strrev($filename), DIRSEP));
+            $path = SITEPATH . 'templates/' .  $getRoute . '/';
+            $filename = substr($path, 0, -1) . '.phtml';
+            $path1 = strrev(strstr(strrev($filename), '/'));
 
             if (is_readable($filename)) {
                 if (is_readable($path1 . 'header.phtml'))
@@ -104,35 +104,35 @@ class Template implements ArrayAccess {
             return;
         }
 
-        $route = $getRoute . DIRSEP;
-        $path = SITEPATH . 'templates' . DIRSEP;
-        $countRoute = substr_count($route, DIRSEP) + 1;
+        $route = $getRoute . '/';
+        $path = SITEPATH . 'templates/';
+        $countRoute = substr_count($route, '/') + 1;
 
         // Подключаем последовательно header'ы
         for ($i = 0; $i < $countRoute; $i++) {
             if (is_readable($path . 'header.phtml'))
                 require $path . 'header.phtml';
 
-            $path .= strstr($route, DIRSEP, true) . DIRSEP;
-            $route = substr(strstr($route, DIRSEP), strlen(DIRSEP));
+            $path .= strstr($route, '/', true) . '/';
+            $route = substr(strstr($route, '/'), 1);
         }
 
-        $path = substr($path, 0, -strlen(DIRSEP));
+        $path = substr($path, 0, -1);
 
         // Подключаем сам нужный шаблон
         if (is_readable($path . 'index.phtml'))
             require $path . 'index.phtml';
 
         // Подключаем footer'ы в обратном порядке
-        $route = $getRoute . DIRSEP;
-        $path = SITEPATH . 'templates' . DIRSEP . $route;
+        $route = $getRoute . '/';
+        $path = SITEPATH . 'templates/' . $route;
 
         for ($i = 0; $i < $countRoute; $i++) {
             if (is_readable($path . 'footer.phtml'))
                 require $path . 'footer.phtml';
 
-            $path = substr(strrev($path), strlen(DIRSEP));
-            $path = strstr($path, DIRSEP);
+            $path = substr(strrev($path), 1);
+            $path = strstr($path, '/');
             $path = strrev($path);
         }
     }

@@ -10,13 +10,11 @@ error_reporting (E_ALL);
 
 session_start();
 
-define ('DIRSEP', DIRECTORY_SEPARATOR);
-
 // Определяем директорию с сайтом
-define ('SITEPATH', realpath(dirname(__FILE__)) . DIRSEP);
+define ('SITEPATH', realpath(dirname(__FILE__)) . '/');
 
 // Инициализируем систему
-require SITEPATH . 'engine' . DIRSEP . 'startup.php';
+require SITEPATH . 'engine/startup.php';
 
 // Registry, в котором будем хранить глобальные значения
 $registry = new Registry;

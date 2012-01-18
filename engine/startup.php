@@ -3,19 +3,13 @@
  * Загрузка классов "на лету"
  */
 function __autoload($className) {
-    // TODO: надо лучше сделать определение имени файла (с проверкой)
+    if (strstr($className, '.'))
+        return false;
+
     $filename = $className . '.php';
 
-    $file = SITEPATH . 'engine' . DIRSEP . $filename;
-
-    if (file_exists($file)) {
-        require $file;
-        return;
-    }
-
-    $file = SITEPATH . 'engine' . DIRSEP . 'modules' . $filename;
-
-    if (file_exists($file)) {
+    $file = SITEPATH . 'engine/' . $filename;
+    if (is_readable($file)) {
         require $file;
         return;
     }

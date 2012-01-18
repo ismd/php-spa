@@ -1,6 +1,6 @@
 RewriteEngine on
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-
+RewriteCond %{REQUEST_FILENAME} !images/*
+RewriteCond %{REQUEST_FILENAME} !js/*
+RewriteCond %{REQUEST_FILENAME} !css/*
 RewriteRule ^(.*)$ index.php?route=$1 [L,QSA]
