@@ -20,7 +20,7 @@ class Router {
             $this->level = substr_count($rootpath, '/') + 1;
 
         // Путь к директории с контроллерами и моделями
-        $path = SITEPATH . 'application' . ($rootpath != '' ? '/' . $rootpath : '');
+        $path = SITEPATH . 'application/' . ($rootpath != '' ? $rootpath . '/' : '');
 
         if (!is_dir($path))
             die("Не могу найти директорию с движком игры.");
@@ -35,8 +35,8 @@ class Router {
         // Анализируем путь
         $this->getController();
 
-        $controllerFile = $this->rootpath . '/' . $this->controller . 'Controller.php';
-        $modelFile = $this->rootpath . '/' . $this->controller . 'Model.php';
+        $controllerFile = $this->rootpath . $this->controller . 'Controller.php';
+        $modelFile = $this->rootpath . $this->controller . 'Model.php';
 
         // Если не доступен файл контроллера
         if (!is_readable($controllerFile)) {
@@ -71,7 +71,7 @@ class Router {
             $reqModel[$countReqModel - 1] = ucfirst($reqModel[$countReqModel - 1]);
             $reqModel = implode('/', $reqModel);
 
-            $filename = SITEPATH . 'engine/modules/' . $reqModel . 'Model.php';
+            $filename = SITEPATH . 'application/' . $reqModel . 'Model.php';
 
             if (is_readable($filename)) {
                 require_once $filename;
