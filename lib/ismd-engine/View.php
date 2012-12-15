@@ -9,18 +9,38 @@ class View extends ArrayObject {
 
     protected $_registry;
     
-    protected $_js  = array(); // Массив подключаемых js-файлов
-    protected $_css = array(); // Массив подключаемых css-файлов
+    /**
+     * Массив подключаемых js-файлов
+     * @var array
+     */
+    protected $_js  = array();
+    
+    /**
+     * Массив подключаемых css-файлов
+     * @var array
+     */
+    protected $_css = array();
 
-    protected $_title = '';    // Заголовок страницы
-    protected $_empty = false; // Необходимость загружать header'ы и footer'ы
+    /**
+     * Заголовок страницы
+     * @var string
+     */
+    protected $_title = '';
+    
+    /**
+     * Необходимость загружать header'ы и footer'ы
+     * Для ajax ответов нужно выставлять значение true
+     * 
+     * @var bool
+     */
+    protected $_empty = false;
 
     public function __construct($registry) {
         $this->_registry = $registry;
     }
 
     /**
-     * Показываем нужный шаблон
+     * Отображает страницу
      */
     public function render() {
         // Отправляем заголовок с указанием кодировки
@@ -161,11 +181,13 @@ class View extends ArrayObject {
 
     /**
      * Устанавливает заголовок страницы
-     *
+     * 
      * @param string
+     * @return View
      */
     public function setTitle($value) {
         $this->_title = '::' . (string)$value;
+        return $this;
     }
 
     public function getTitle() {
