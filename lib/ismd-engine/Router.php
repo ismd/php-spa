@@ -1,31 +1,44 @@
 <?php
 /**
  * Роутер
+ * 
+ * Использование:
+ * - $router->delegate() -- Подключает нужные классы, выполняет нужный метод
+ * - $router->controller -- Значение контроллера
+ * - $router->action     -- Значение действия
+ * - $router->args       -- Массив аргументов, переданных в url
  *
  * @author ismd
  */
 
-class Router {
+class Router extends AbstractModel {
 
     protected $_registry;
     protected $_route;
-    protected $_rootpath;
+    
+    /**
+     * Контроллер
+     * @var string
+     */
     protected $_controller;
+    
+    /**
+     * Действие
+     * @var string
+     */
     protected $_action;
+    
+    /**
+     * Аргументы запроса
+     * Пример: <контроллер>/<действие>/<арг.1>/<арг.2>/...
+     * 
+     * @var array
+     */
+    protected $_args = array();
 
-    // Уровень текущей вложенности роутера
-    protected $_level = 0;
-
-    public function __construct($registry, $route, $rootpath = '') {
+    public function __construct($registry, $route = 'index') {
         $this->_registry = $registry;
         $this->_route    = $route;
-
-        if ($rootpath != '') {
-            $this->_level = substr_count($rootpath, '/') + 1;
-        }
-
-        // Путь к директории с контроллерами
-        $this->_rootpath = SITEPATH . 'application/controllers/' . ($rootpath != '' ? $rootpath . '/' : '');
     }
 
     /**
@@ -33,12 +46,19 @@ class Router {
      */
     public function delegate() {
         // Анализируем путь
-        $this->getController();
+        $this->parseRoute();
+        
+        // Имя класса контроллера
+        $controllerName = ucfirst($this->_controller) . 'Controller';
+        
+        // Путь к директории с контроллерами
+        $controllersPath = SITEPATH . 'application/controllers/';
 
-        $controllerFile   = $this->_rootpath . $this->_controller . 'Controller.php';
+        // Путь к контроллеру
+        $controllerFile   = $controllersPath . $controllerName . '.php';
 
         // Если недоступен файл контроллера
-        if (!is_readable($controllerFile)) {
+        if (false == is_readable($controllerFile)) {
             header('Location: /');
             die;
         }
@@ -47,14 +67,13 @@ class Router {
         require $controllerFile;
 
         // Создаём экземпляр контроллера
-        $class        = $this->_controller . 'Controller';
-        $controller   = new $class($this->_registry);
+        $controller = new $controllerName($this->_registry);
 
         $action = $this->_action;
 
-        // Действие доступно?
-        if (!is_callable(array($controller, $action))) {
-            header('Location: /' . strtolower($this->_controller));
+        // Если действие недоступно
+        if (false == is_callable(array($controller, $action))) {
+            header('Location: /');
             die;
         }
 
@@ -64,50 +83,44 @@ class Router {
         }
 
         // Выполняем действие
-        $controller->$action($this->_registry->args);
+        $controller->$action();
     }
 
     /**
-     * Определяем контроллер и действие
+     * Определяет контроллер, действие и аргументы
      */
-    protected function getController() {
-        $route = 'index';
+    protected function parseRoute() {
+        $route      = explode('/', $this->_route);
+        $countRoute = count($route);
 
-        if (!empty($this->_route)) {
-            $route = explode('/', $this->_route);
-
-            for ($i = 0; $i < $this->_level; $i++) {
-                unset($route[$i]);
-            }
-
-            $route = trim(implode('/', $route), '/');
+        // Контроллер
+        if ($countRoute > 0) {
+            $this->_controller = strtolower($route[0]);
+        } else {
+            $this->_controller = 'index';
         }
-
-        // Получаем раздельные части
-        $parts = explode('/', $route);
-
-        // Делаем первую букву заглавной
-        $parts[0] = ucfirst($parts[0]);
-
-        $controller   = $parts[0];
-        $action       = (empty($parts[1])) ? 'index' : $parts[1];
-
-        $this->_controller   = $controller;
-        $this->_action       = $action;
-
+        
+        // Действие
+        if ($countRoute > 1) {
+            $this->_action = strtolower($route[1]);
+        } else {
+            $this->_action = 'index';
+        }
+        
         // Аргументы
-        $args = array();
-        $countParts = count($parts);
-        for ($i = 2; $i < $countParts; $i++) {
-            $args[] = $parts[$i];
-        }
-
-        $this->_registry->args = $args;
+        $this->_args = array_slice($route, 2);
+    }
+    
+    /**
+     * Возвращает контроллер
+     * @return string
+     */
+    public function getController() {
+        return $this->_controller;
     }
 
     /**
-     * Возвращает текущее действие
-     *
+     * Возвращает действие
      * @return string
      */
     public function getAction() {
@@ -115,11 +128,10 @@ class Router {
     }
 
     /**
-     * Возвращает запрошенный route
-     *
-     * @return string
+     * Возвращает аргументы, переданные в url
+     * @return array
      */
-    public function getRoute() {
-        return $this->_route;
+    public function getArgs() {
+        return $this->_args;
     }
 }

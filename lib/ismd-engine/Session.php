@@ -30,10 +30,11 @@ class Session {
     
     public function __set($name, $value) {
         $this->_data[$name] = $value;
+        return $this;
     }
     
     public function __get($name) {
-        if (!isset($this->_data[$name])) {
+        if (false == isset($this->_data[$name])) {
             return null;
         }
         
@@ -45,6 +46,10 @@ class Session {
     }
     
     public function __unset($name) {
+        if (false == isset($this->_data[$name])) {
+            return;
+        }
+        
         unset($this->_data[$name]);
     }
 }

@@ -1,13 +1,27 @@
 <?php
 /**
  * Класс для работы с шаблонами
+ * 
+ * Использование:
+ * - $view->title  = 'test'        -- Устанавливает заголовок страницы `test'
+ * - $view->layout = 'empty'       -- Будет подключен layout empty.phtml
+ * - $view->js     = array('test') -- Будет подключен js-файл с именем test.js
+ * - $view->css    = array('test') -- Будет подключен css-файл с именем test.css
+ * - $view->test   = 'test'        -- Передача в шаблон переменной test со значением 'test'
+ * - $this->content                -- Возвращает подключаемый шаблон. Необходимо использовать в layout'е
  *
  * @author ismd
  */
 
-class View extends ArrayObject {
+class View {
 
     protected $_registry;
+    
+    /**
+     * Переменные шаблона
+     * @var array
+     */
+    protected $_data = array();
     
     /**
      * Массив подключаемых js-файлов
@@ -28,15 +42,84 @@ class View extends ArrayObject {
     protected $_title = '';
     
     /**
-     * Необходимость загружать header'ы и footer'ы
-     * Для ajax ответов нужно выставлять значение true
-     * 
-     * @var bool
+     * Layout для отображения
+     * @var string
      */
-    protected $_empty = false;
+    protected $_layout = 'default';
 
     public function __construct($registry) {
         $this->_registry = $registry;
+    }
+    
+    public function __set($name, $value) {
+        switch ($name) {
+            case 'title':
+                return $this->setTitle($value);
+                break;
+            
+            case 'layout':
+                return $this->setLayout($value);
+                break;
+            
+            case 'js':
+                return $this->setJs($value);
+                break;
+            
+            case 'css':
+                return $this->setCss($value);
+                break;
+            
+            default:
+                break;
+        }
+        
+        $this->_data[$name] = $value;
+        return $this;
+    }
+    
+    public function __get($name) {
+        switch ($name) {
+            case 'title':
+                return $this->getTitle();
+                break;
+            
+            case 'layout':
+                return $this->getLayout();
+                break;
+            
+            case 'js':
+                return $this->getJs();
+                break;
+            
+            case 'css':
+                return $this->getCss();
+                break;
+            
+            case 'content':
+                return $this->getContent();
+                break;
+            
+            default:
+                break;
+        }
+        
+        if (false == isset($this->_data[$name])) {
+            return null;
+        }
+        
+        return $this->_data[$name];
+    }
+    
+    public function __isset($name) {
+        return isset($this->_data[$name]);
+    }
+    
+    public function __unset($name) {
+        if (false == isset($this->_data[$name])) {
+            return;
+        }
+        
+        unset($this->_data[$name]);
     }
 
     /**
@@ -45,103 +128,24 @@ class View extends ArrayObject {
     public function render() {
         // Отправляем заголовок с указанием кодировки
         header('Content-Type: text/html; charset=utf-8');
+        require SITEPATH . 'application/layouts/' . $this->_layout . '.phtml';
+    }
 
-        $route = $this->_registry->router->getRoute();
-        $route = ($route != '') ? explode('/', $route) : array('index');
-        $path  = SITEPATH . 'application/views/';
+    /**
+     * Возвращает содержимое запрошенной страницы
+     * @return string
+     */
+    protected function getContent() {
+        $router = $this->_registry->router;
+        
+        // Путь к директории с шаблонами
+        $viewsPath  = SITEPATH . 'application/views/';
 
-        $route = array_diff($route, array('..'));
+        // Путь к файлу шаблона
+        $filename = $viewsPath . $router->controller . '/' . $router->action . '.phtml';
 
-        // Подключаем только один файл, если надо
-        if ($this->_empty == true) {
-            $filename = $path . implode('/', $route) . '.phtml';
-
-            if (is_readable($filename)) {
-                require $filename;
-            }
-
-            return;
-        }
-
-        $headers = array();
-        $footers = array();
-
-        $countRoute = count($route);
-
-        // Ищем нужные нам хэдеры и футеры
-        for ($i = 0; $i < $countRoute - 1; $i++) {
-            if (is_readable($path . 'header.phtml')) {
-                $headers[] = $path . 'header.phtml';
-            }
-
-            if (is_readable($path . 'footer.phtml')) {
-                $footers[] = $path . 'footer.phtml';
-            }
-
-            $path .= $route[$i] . '/';
-
-            if (!is_dir($path)) {
-                return;
-            }
-        }
-
-        // Сам файл шаблона и возможно ближайшие хэдер и футер
-        if (is_dir($path . $route[$countRoute - 1])) {
-            $fileInSubDir = is_readable($path . $route[$countRoute - 1] . '/index.phtml');
-
-            if (is_readable($path . 'header.phtml')) {
-                $headers[] = $path . 'header.phtml';
-            }
-
-            if ($fileInSubDir && is_readable($path . $route[$countRoute - 1] . '/header.phtml')) {
-                $headers[] = $path . $route[$countRoute - 1] . '/header.phtml';
-            }
-
-            if ($fileInSubDir) {
-                $filepath = $path . $route[$countRoute - 1] . '/index.phtml';
-            } elseif ( is_readable($path . $route[$countRoute - 1] . '.phtml') ) {
-                $filepath = $path . $route[$countRoute - 1] . '.phtml';
-            } else {
-                return;
-            }
-
-            if (is_readable($path . 'footer.phtml')) {
-                $footers[] = $path . 'footer.phtml';
-            }
-
-            if ($fileInSubDir && is_readable($path . $route[$countRoute - 1] . '/footer.phtml')) {
-                $footers[] = $path . $route[$countRoute - 1] . '/footer.phtml';
-            }
-        } else {
-            if (is_readable($path . 'header.phtml')) {
-                $headers[] = $path . 'header.phtml';
-            }
-
-            if (is_readable($path . $route[$countRoute - 1] . '.phtml')) {
-                $filepath = $path . $route[$countRoute - 1] . '.phtml';
-            } else {
-                return;
-            }
-
-            if (is_readable($path . 'footer.phtml')) {
-                $footers[] = $path . 'footer.phtml';
-            }
-        }
-
-        // Подключаем все нужные хэдеры
-        foreach ($headers as $header) {
-            require $header;
-        }
-
-        // Подключаем сам файл шаблона
-        if (is_readable($filepath)) {
-            require $filepath;
-        }
-
-        // Подключаем все нужные футеры
-        $footers = array_reverse($footers);
-        foreach ($footers as $footer) {
-            require $footer;
+        if (is_readable($filename)) {
+            require $filename;
         }
     }
 
@@ -152,7 +156,7 @@ class View extends ArrayObject {
      * @param string|array $link Ссылка или массив ссылок на javascript-файлы
      * @return View
      */
-    public function js($link) {
+    public function setJs($link) {
         if (is_array($link)) {
             $this->_js = array_merge($this->_js, $link);
         } else {
@@ -160,6 +164,14 @@ class View extends ArrayObject {
         }
 
         return $this;
+    }
+    
+    /**
+     * Возвращает массив js-файлов, которые будут подключены
+     * @return array
+     */
+    public function getJs() {
+        return $this->_js;
     }
 
     /**
@@ -169,7 +181,7 @@ class View extends ArrayObject {
      * @param string|array $link Ссылка или массив ссылок на css-файлы
      * @return View
      */
-    public function css($link) {
+    public function setCss($link) {
         if (is_array($link)) {
             $this->_css = array_merge($this->_css, $link);
         } else {
@@ -177,6 +189,14 @@ class View extends ArrayObject {
         }
 
         return $this;
+    }
+    
+    /**
+     * Возвращает массив css-файлов, которые будут подключены
+     * @return array
+     */
+    public function getCss() {
+        return $this->_css;
     }
 
     /**
@@ -195,17 +215,17 @@ class View extends ArrayObject {
     }
 
     /**
-     * Устаналивает необходимость загружать header'ы и footer'ы
+     * Устаналивает Layout
      *
-     * @param bool
+     * @param string
      * @return View
      */
-    public function setEmpty($value) {
-        $this->_empty = (bool)$value;
+    public function setLayout($value) {
+        $this->_layout = (string)$value;
         return $this;
     }
 
-    public function getEmpty() {
-        return $this->_empty;
+    public function getLayout() {
+        return $this->_layout;
     }
 }
