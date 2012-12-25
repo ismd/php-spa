@@ -41,6 +41,9 @@ $registry->router = new Router(
     (!empty($_GET['route']) ? $_GET['route'] : 'index')
 );
 
+// Инициализируем запрос
+$registry->request = new Request;
+
 // Загружаем класс для работы с шаблонами
 $registry->view = new View($registry);
 
