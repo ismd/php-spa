@@ -1,12 +1,12 @@
 <?php
 /**
  * Роутер
- * 
+ *
  * Использование:
- * - $router->delegate() -- Подключает нужные классы, выполняет нужный метод
- * - $router->controller -- Значение контроллера
- * - $router->action     -- Значение действия
- * - $router->args       -- Массив аргументов, переданных в url
+ * $router->delegate() -- Подключает нужные классы, выполняет нужный метод
+ * $router->getController()
+ * $router->getAction()
+ * $router->getArgs()
  *
  * @author ismd
  */
@@ -15,23 +15,23 @@ class Router extends AbstractModel {
 
     protected $_registry;
     protected $_route;
-    
+
     /**
      * Контроллер
      * @var string
      */
     protected $_controller;
-    
+
     /**
      * Действие
      * @var string
      */
     protected $_action;
-    
+
     /**
      * Аргументы запроса
      * Пример: <контроллер>/<действие>/<арг.1>/<арг.2>/...
-     * 
+     *
      * @var array
      */
     protected $_args = array();
@@ -47,10 +47,10 @@ class Router extends AbstractModel {
     public function delegate() {
         // Анализируем путь
         $this->parseRoute();
-        
+
         // Имя класса контроллера
         $controllerName = ucfirst($this->_controller) . 'Controller';
-        
+
         // Путь к директории с контроллерами
         $controllersPath = SITEPATH . 'application/controllers/';
 
@@ -99,18 +99,18 @@ class Router extends AbstractModel {
         } else {
             $this->_controller = 'index';
         }
-        
+
         // Действие
         if ($countRoute > 1) {
             $this->_action = strtolower($route[1]);
         } else {
             $this->_action = 'index';
         }
-        
+
         // Аргументы
         $this->_args = array_slice($route, 2);
     }
-    
+
     /**
      * Возвращает контроллер
      * @return string

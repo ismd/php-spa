@@ -1,14 +1,39 @@
 <?php
 /**
  * Класс для работы с шаблонами
- * 
- * Использование:
- * - $view->title  = 'test'        -- Устанавливает заголовок страницы `test'
- * - $view->layout = 'empty'       -- Будет подключен layout empty.phtml
- * - $view->js     = array('test') -- Будет подключен js-файл с именем test.js
- * - $view->css    = array('test') -- Будет подключен css-файл с именем test.css
- * - $view->test   = 'test'        -- Передача в шаблон переменной test со значением 'test'
- * - $this->content                -- Возвращает подключаемый шаблон. Необходимо использовать в layout'е
+ *
+ * Установка заголовка страницы `test'
+ * $view->setTitle('test')
+ *
+ * Будет подключен layout empty.phtml
+ * $view->setLayout('empty')
+ *
+ * Будут подключены js-файлы test.js и test1.js
+ * $view->appendJs(array('test', 'test1'))
+ *
+ * Будут подключены css-файлы test.css и test1.css
+ * $view->appendCss(array('test', 'test1'))
+ *
+ * Передача в шаблон переменной test со значением 'test'
+ * $view->test = 'test'
+ *
+ * Возвращает подключаемый шаблон. Необходимо использовать в layout'е
+ * $this->content()
+ *
+ * Возвращает заголовок страницы
+ * $this->getTitle()
+ *
+ * Возвращает имя layout'а
+ * $this->getLayout()
+ *
+ * Возвращает массив js-файлов, которые необходимо подключить
+ * $this->getJs()
+ *
+ * Возвращает массив css-файлов, которые необходимо подключить
+ * $this->getCss()
+ *
+ * Обращаться к переменным в шаблоне необходимо следующим образом
+ * $this->test
  *
  * @author ismd
  */
@@ -16,19 +41,19 @@
 class View {
 
     protected $_registry;
-    
+
     /**
      * Переменные шаблона
      * @var array
      */
     protected $_data = array();
-    
+
     /**
      * Массив подключаемых js-файлов
      * @var array
      */
     protected $_js  = array();
-    
+
     /**
      * Массив подключаемых css-файлов
      * @var array
@@ -40,7 +65,7 @@ class View {
      * @var string
      */
     protected $_title = '';
-    
+
     /**
      * Layout для отображения
      * @var string
@@ -50,75 +75,29 @@ class View {
     public function __construct($registry) {
         $this->_registry = $registry;
     }
-    
+
     public function __set($name, $value) {
-        switch ($name) {
-            case 'title':
-                return $this->setTitle($value);
-                break;
-            
-            case 'layout':
-                return $this->setLayout($value);
-                break;
-            
-            case 'js':
-                return $this->setJs($value);
-                break;
-            
-            case 'css':
-                return $this->setCss($value);
-                break;
-            
-            default:
-                break;
-        }
-        
         $this->_data[$name] = $value;
         return $this;
     }
-    
+
     public function __get($name) {
-        switch ($name) {
-            case 'title':
-                return $this->getTitle();
-                break;
-            
-            case 'layout':
-                return $this->getLayout();
-                break;
-            
-            case 'js':
-                return $this->getJs();
-                break;
-            
-            case 'css':
-                return $this->getCss();
-                break;
-            
-            case 'content':
-                return $this->getContent();
-                break;
-            
-            default:
-                break;
-        }
-        
         if (false == isset($this->_data[$name])) {
             return null;
         }
-        
+
         return $this->_data[$name];
     }
-    
+
     public function __isset($name) {
         return isset($this->_data[$name]);
     }
-    
+
     public function __unset($name) {
         if (false == isset($this->_data[$name])) {
             return;
         }
-        
+
         unset($this->_data[$name]);
     }
 
@@ -128,21 +107,29 @@ class View {
     public function render() {
         // Отправляем заголовок с указанием кодировки
         header('Content-Type: text/html; charset=utf-8');
-        require SITEPATH . 'application/layouts/' . $this->_layout . '.phtml';
+
+        $filename = SITEPATH . 'application/layouts/' . $this->_layout . '.phtml';
+
+        if (false == is_readable($filename)) {
+            throw new Exception('Cannot read layout file');
+        }
+
+        require $filename;
     }
 
     /**
      * Возвращает содержимое запрошенной страницы
      * @return string
      */
-    protected function getContent() {
+    protected function content() {
         $router = $this->_registry->router;
-        
+
         // Путь к директории с шаблонами
         $viewsPath  = SITEPATH . 'application/views/';
 
         // Путь к файлу шаблона
-        $filename = $viewsPath . $router->controller . '/' . $router->action . '.phtml';
+        $filename = $viewsPath . $router->getController()
+            . '/' . $router->getAction() . '.phtml';
 
         if (is_readable($filename)) {
             require $filename;
@@ -156,7 +143,7 @@ class View {
      * @param string|array $link Ссылка или массив ссылок на javascript-файлы
      * @return View
      */
-    public function setJs($link) {
+    public function appendJs($link) {
         if (is_array($link)) {
             $this->_js = array_merge($this->_js, $link);
         } else {
@@ -165,7 +152,7 @@ class View {
 
         return $this;
     }
-    
+
     /**
      * Возвращает массив js-файлов, которые будут подключены
      * @return array
@@ -181,7 +168,7 @@ class View {
      * @param string|array $link Ссылка или массив ссылок на css-файлы
      * @return View
      */
-    public function setCss($link) {
+    public function appendCss($link) {
         if (is_array($link)) {
             $this->_css = array_merge($this->_css, $link);
         } else {
@@ -190,7 +177,7 @@ class View {
 
         return $this;
     }
-    
+
     /**
      * Возвращает массив css-файлов, которые будут подключены
      * @return array
@@ -201,7 +188,7 @@ class View {
 
     /**
      * Устанавливает заголовок страницы
-     * 
+     *
      * @param string
      * @return View
      */
