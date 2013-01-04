@@ -8,8 +8,10 @@
  * Будет подключен layout empty.phtml
  * $view->setLayout('empty')
  *
- * Будут подключены js-файлы test.js и test1.js
- * $view->appendJs(array('test', 'test1'))
+ * Будет подключен js-файл test.js
+ * $view->appendJs('test')
+ * Вторым параметром возможно передавать дополнительные атрибуты
+ * $view->appendJs('test', array('data-main' => 'js/main'))
  *
  * Будут подключены css-файлы test.css и test1.css
  * $view->appendCss(array('test', 'test1'))
@@ -27,9 +29,11 @@
  * $this->getLayout()
  *
  * Возвращает массив js-файлов, которые необходимо подключить
+ * Вызов только из шаблонов
  * $this->getJs()
  *
  * Возвращает массив css-файлов, которые необходимо подключить
+ * Вызов только из шаблонов
  * $this->getCss()
  *
  * Обращаться к переменным в шаблоне необходимо следующим образом
@@ -138,17 +142,16 @@ class View {
 
     /**
      * Переданная ссылка будет вставлена в качестве ссылки на javascript-файл
-     * Может быть передан массив ссылок
      *
-     * @param string|array $link Ссылка или массив ссылок на javascript-файлы
+     * @param string $link Ссылка на javascript-файл
+     * @param array $attributes Дополнительные атрибуты
      * @return View
      */
-    public function appendJs($link) {
-        if (is_array($link)) {
-            $this->_js = array_merge($this->_js, $link);
-        } else {
-            $this->_js[] = $link;
-        }
+    public function appendJs($link, $attributes = array()) {
+        $this->_js[] = array(
+            'link'       => $link,
+            'attributes' => $attributes,
+        );
 
         return $this;
     }
@@ -157,7 +160,7 @@ class View {
      * Возвращает массив js-файлов, которые будут подключены
      * @return array
      */
-    public function getJs() {
+    protected function getJs() {
         return $this->_js;
     }
 
@@ -182,7 +185,7 @@ class View {
      * Возвращает массив css-файлов, которые будут подключены
      * @return array
      */
-    public function getCss() {
+    protected function getCss() {
         return $this->_css;
     }
 

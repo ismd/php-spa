@@ -1,11 +1,14 @@
 <?php
 /**
  * Класс запроса. Доступ к $_POST и $_GET
+ * Синглтон
  *
  * @author ismd
  */
 
 class Request extends AbstractModel {
+
+    private static $_instance;
     
     protected $_post;
     protected $_get;
@@ -13,6 +16,24 @@ class Request extends AbstractModel {
     public function __construct() {
         $this->_post = new PostRequest;
         $this->_get  = new GetRequest;
+    }
+
+    private function __clone() {
+    }
+
+    private function __wakeup() {
+    }
+
+    /**
+     * Возвращает инстанс запроса
+     * @return Registry
+     */
+    public static function getInstance() {
+        if (is_null(self::$_instance)) {
+            self::$_instance = new Request;
+        }
+
+        return self::$_instance;
     }
 
     public function getPost() {

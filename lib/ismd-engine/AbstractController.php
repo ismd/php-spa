@@ -10,13 +10,12 @@ abstract class AbstractController {
     protected $registry;
     protected $session;
     protected $view;
-    protected $request;
+    protected $_request;
 
     public function __construct($registry) {
         $this->registry = $registry;
         $this->session  = $registry->session;
         $this->view     = $registry->view;
-        $this->request  = $registry->request;
     }
 
     /**
@@ -32,5 +31,17 @@ abstract class AbstractController {
     protected function redirect($url) {
         header("Location: $url");
         die;
+    }
+
+    /**
+     * Возвращает запрос
+     * @return Request
+     */
+    protected function getRequest() {
+        if (null == $this->_request) {
+            $this->_request = Request::getInstance();
+        }
+        
+        return $this->_request;
     }
 }

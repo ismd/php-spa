@@ -1,6 +1,7 @@
 <?php
 /**
- * Класс для логирования. Синглтон
+ * Класс для логирования
+ * Синглтон
  *
  * @author ismd
  */
@@ -21,13 +22,11 @@ class Logger {
 
     /**
      * Возвращает инстанс логгера
-     *
-     * @global Registry $registry
+     * @param Registry $registry
      * @return Logger
      */
-    public static function getInstance() {
+    public static function getInstance(Registry $registry) {
         if (is_null(self::$_instance)) {
-            global $registry;
             self::$_instance = new Logger($registry->config->log->filename);
         }
 
