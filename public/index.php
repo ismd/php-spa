@@ -1,51 +1,26 @@
 <?php
-/**
- * Инициализируем всё необходимое и запускаем действие
- */
-
 error_reporting(E_ALL ^ E_NOTICE);
-
-session_start();
 
 // Определяем директорию с сайтом
 define('SITEPATH', realpath(dirname(__FILE__)) . '/../');
 
 // Инициализируем систему
-require SITEPATH . 'lib/ismd-engine/startup.php';
+require SITEPATH . 'lib/php-spa/startup.php';
 
-// Registry, в котором будем хранить глобальные значения
-$registry = new Registry;
+// PsRegistry, в котором будем хранить глобальные значения
+$registry = new PsRegistry;
 
 // Читаем конфиг и сохраняем в $registry
-try {
-    $registry->config = readConfig();
-} catch (Exception $e) {
-    // Если не удалось прочитать конфиг
-    $_GET['route'] = 'index';
-}
+$registry->config = PsConfig::getInstance(SITEPATH)->getConfig();
 
-// Инициализируем собственную реализацию сессий с блэкджеком
-$registry->session = new Session;
-
-// Подключаемся к БД и сохраняем соединение в $registry->db
-try {
-    $registry->db = dbConnect($registry->config->database);
-} catch (Exception $e) {
-    // Если не удалось подключиться к БД
-    $_GET['route'] = 'index';
-}
+// Устанавливаем временную зону сервера
+date_default_timezone_set($registry->config->timezone->server);
 
 // Загружаем router
-$registry->router = new Router(
-    $registry,
-    (!empty($_GET['route']) ? $_GET['route'] : 'index')
-);
-
-// Инициализируем запрос
-$registry->request = new Request;
+$registry->router = new PsRouter($registry, $_GET['route']);
 
 // Загружаем класс для работы с шаблонами
-$registry->view = new View($registry);
+$registry->view = new PsView($registry);
 
 // Выбираем нужный контроллер, определяем действие и выполняем
 $registry->router->delegate();

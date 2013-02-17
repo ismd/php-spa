@@ -2,19 +2,41 @@
 /**
  * Роутер
  *
- * Использование:
- * $router->delegate() -- Подключает нужные классы, выполняет нужный метод
+ * Запуск:
+ * $router->delegate()
+ *
+ * Получение имени контроллера:
  * $router->getController()
+ *
+ * Получение имени действия:
  * $router->getAction()
+ *
+ * Получение переданных аргументов
  * $router->getArgs()
  *
  * @author ismd
  */
 
-class Router extends AbstractModel {
+class PsRouter {
+
+    const INDEX_REQUEST   = 1;
+    const PARTIAL_REQUEST = 2;
+    const ACTION_REQUEST  = 3;
 
     protected $_registry;
     protected $_route;
+
+    /**
+     * Возможные префиксы
+     * @var string[]
+     */
+    protected $_prefixes;
+
+    /**
+     * Префикс запроса
+     * @var string
+     */
+    protected $_prefix;
 
     /**
      * Контроллер
@@ -30,15 +52,16 @@ class Router extends AbstractModel {
 
     /**
      * Аргументы запроса
-     * Пример: <контроллер>/<действие>/<арг.1>/<арг.2>/...
-     *
-     * @var array
+     * Пример: <префикс>/<контроллер>/<действие>/<арг.1>/<арг.2>/...
+     * @var mixed[]
      */
     protected $_args = array();
 
-    public function __construct($registry, $route = 'index') {
+    public function __construct($registry, $route) {
         $this->_registry = $registry;
         $this->_route    = $route;
+
+        $this->_prefixes = $this->_registry->config->url_prefix;
     }
 
     /**
@@ -55,25 +78,36 @@ class Router extends AbstractModel {
         $controllersPath = SITEPATH . 'application/controllers/';
 
         // Путь к контроллеру
-        $controllerFile   = $controllersPath . $controllerName . '.php';
+        $controllerFile = $controllersPath . $controllerName . '.php';
 
         // Если недоступен файл контроллера
-        if (false == is_readable($controllerFile)) {
-            header('Location: /');
+        if (!is_readable($controllerFile)) {
             die;
         }
 
         // Подключаем контроллер
-        require $controllerFile;
+        require_once $controllerFile;
 
         // Создаём экземпляр контроллера
         $controller = new $controllerName($this->_registry);
 
+        // Определяем вызываемый метод
         $action = $this->_action;
 
+        $requestType = $this->getRequestType();
+
+        switch ($requestType) {
+            case self::PARTIAL_REQUEST:
+                $action .= 'Partial';
+                break;
+
+            case self::ACTION_REQUEST:
+                $action .= 'Action';
+                break;
+        }
+
         // Если действие недоступно
-        if (false == is_callable(array($controller, $action))) {
-            header('Location: /');
+        if (!is_callable(array($controller, $action))) {
             die;
         }
 
@@ -88,27 +122,34 @@ class Router extends AbstractModel {
 
     /**
      * Определяет контроллер, действие и аргументы
+     * Устанавливает свойства _controller, _action и _args
      */
     protected function parseRoute() {
-        $route      = explode('/', $this->_route);
+        $route = explode('/', $this->_route);
+
         $countRoute = count($route);
 
-        // Контроллер
-        if ($countRoute > 0) {
-            $this->_controller = strtolower($route[0]);
-        } else {
+        if (1 == $countRoute) {
             $this->_controller = 'index';
+            $this->_action     = 'index';
+            return;
         }
 
+        // Префикс
+        $this->_prefix = $route[0];
+
+        // Контроллер
+        $this->_controller = strtolower($route[1]);
+
         // Действие
-        if ($countRoute > 1) {
-            $this->_action = strtolower($route[1]);
+        if ($countRoute > 2) {
+            $this->_action = strtolower($route[2]);
         } else {
             $this->_action = 'index';
         }
 
         // Аргументы
-        $this->_args = array_slice($route, 2);
+        $this->_args = array_slice($route, 3);
     }
 
     /**
@@ -129,9 +170,27 @@ class Router extends AbstractModel {
 
     /**
      * Возвращает аргументы, переданные в url
-     * @return array
+     * @return mixed[]
      */
     public function getArgs() {
         return $this->_args;
+    }
+
+    /**
+     * Возвращает тип запрошенной страницы
+     * Возможные варианты:
+     * - PsRouter::INDEX_REQUEST
+     * - PsRouter::PARTIAL_REQUEST
+     * - PsRouter::ACTION_REQUEST
+     * @return int
+     */
+    public function getRequestType() {
+        if ($this->_prefix == $this->_prefixes->partial) {
+            return self::PARTIAL_REQUEST;
+        } elseif ($this->_prefix == $this->_prefixes->action) {
+            return self::ACTION_REQUEST;
+        } else {
+            return self::INDEX_REQUEST;
+        }
     }
 }

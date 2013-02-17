@@ -2,16 +2,21 @@
 /**
  * Класс для логирования
  * Синглтон
- *
  * @author ismd
  */
-class Logger {
 
-    private static $_instance;
-    private $_logFile;
+class PsLogger {
+
+    protected static $_instance;
+
+    /**
+     * Путь к файлу, в который пишем лог
+     * @var string
+     */
+    protected $_filename;
 
     private function __construct($filename) {
-        $this->_logFile = $filename;
+        $this->_filename = $filename;
     }
 
     private function __clone() {
@@ -22,27 +27,33 @@ class Logger {
 
     /**
      * Возвращает инстанс логгера
-     * @param Registry $registry
-     * @return Logger
+     * @param PsRegistry $registry
+     * @return PsLogger
      */
-    public static function getInstance(Registry $registry) {
+    public static function getInstance(PsRegistry $registry) {
         if (is_null(self::$_instance)) {
-            self::$_instance = new Logger($registry->config->log->filename);
+            self::$_instance = new PsLogger($registry->config->log->filename);
         }
 
         return self::$_instance;
     }
 
+    /**
+     * Осуществляет логирование
+     * @param string $text
+     * @return PsLogger
+     */
     public function log($text) {
-        $file = fopen($this->_logFile, 'a');
+        $file = fopen($this->_filename, 'w');
 
         if (!is_string($text)) {
             $text = print_r($text, true);
         }
 
         $text = date('r') . "\t" .  $text . "\n";
-
         fwrite($file, $text);
         fclose($file);
+        
+        return $this;
     }
 }
