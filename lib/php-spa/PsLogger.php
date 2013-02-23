@@ -43,17 +43,17 @@ class PsLogger {
      * @param string $text
      * @return PsLogger
      */
-    public function log($text) {
-        $file = fopen($this->_filename, 'w');
+    public function log($data) {
+        $file = fopen($this->_filename, 'a');
 
-        if (!is_string($text)) {
-            $text = print_r($text, true);
+        if (!is_string($data)) {
+            $data = print_r($data, true);
         }
 
-        $text = date('r') . "\t" .  $text . "\n";
-        fwrite($file, $text);
+        $data = date('r') . "\t" .  $data . "\n";
+        fwrite($file, $data);
         fclose($file);
-        
+
         return $this;
     }
 }

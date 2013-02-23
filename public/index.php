@@ -25,5 +25,5 @@ $registry->view = new PsView($registry);
 // Выбираем нужный контроллер, определяем действие и выполняем
 $registry->router->delegate();
 
-// Отображаем шаблон
+// Отображаем вывод
 $registry->view->render();
