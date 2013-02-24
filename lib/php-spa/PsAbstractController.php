@@ -43,13 +43,4 @@ abstract class PsAbstractController extends PsObject {
     protected function getRequest() {
         return PsRequest::getInstance();
     }
-    
-    /**
-     * Перенаправляет на другую страницу
-     * @param string $url
-     */
-    protected function redirect($url) {
-        header("Location: $url");
-        die;
-    }
 }

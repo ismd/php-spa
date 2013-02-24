@@ -11,7 +11,7 @@ abstract class PsAbstractAuthController extends PsAbstractController {
         parent::__construct($registry);
 
         if (is_null($this->session->user)) {
-            $this->redirect('/');
+            die;
         }
     }
 }
