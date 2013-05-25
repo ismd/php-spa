@@ -7,6 +7,5 @@
 class IndexController extends PsAbstractController {
 
     public function index() {
-
     }
 }

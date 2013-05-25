@@ -6,39 +6,22 @@
  * @author ismd
  */
 
-class PsRequest {
+class PsRequest extends PsSingleton {
 
-    protected static $_instance;
-    
-    private function __construct() {
-    }
+    private $_post;
 
-    private function __clone() {
-    }
-
-    private function __wakeup() {
-    }
-
-    /**
-     * Возвращает инстанс запроса
-     * @return PsRequest
-     */
-    public static function getInstance() {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new PsRequest;
-        }
-
-        return self::$_instance;
-    }
-    
     /**
      * Возвращает post-данные
      * return PsPostRequest
      */
     public function getPost() {
-        return PsPostRequest::getInstance();
+        if (null == $this->_post) {
+            $this->_post = new PsPostRequest;
+        }
+
+        return $this->_post;
     }
-    
+
     /**
      * Возвращает true, если переданы данные методом post
      * @return boolean
@@ -50,37 +33,13 @@ class PsRequest {
 
 /**
  * Данные, переданные методом post
- * Синглтон
  */
 class PsPostRequest {
 
-    protected static $_instance;
-
-    private function __construct() {
-    }
-
-    private function __clone() {
-    }
-
-    private function __wakeup() {
-    }
-
-    /**
-     * Возвращает инстанс post-запроса
-     * @return PsPostRequest
-     */
-    public static function getInstance() {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new PsPostRequest;
-        }
-
-        return self::$_instance;
-    }
-    
     public function __get($name) {
         return $_POST[$name];
     }
-    
+
     public function __isset($name) {
         return isset($_POST[$name]);
     }
