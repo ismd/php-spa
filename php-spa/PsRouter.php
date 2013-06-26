@@ -14,8 +14,18 @@
  * Получение переданных аргументов
  * $router->getArgs()
  *
+ * Пример запроса: <префикс>/<контроллер>/<действие>/<арг.1>/<арг.2>/...
+ *
  * @author ismd
  */
+
+class BadControllerException extends Exception {
+    protected $message = 'Не найден контроллер';
+}
+
+class BadActionException extends Exception {
+    protected $message = 'Не найдено действие';
+}
 
 class PsRouter {
 
@@ -23,45 +33,44 @@ class PsRouter {
     const PARTIAL_REQUEST = 2;
     const ACTION_REQUEST  = 3;
 
-    protected $_registry;
-    protected $_route;
+    private $_registry;
+    private $_route;
 
     /**
      * Возможные префиксы
      * @var string[]
      */
-    protected $_prefixes;
+    private $_prefixes;
 
     /**
      * Префикс запроса
      * @var string
      */
-    protected $_prefix;
+    private $_prefix;
 
     /**
      * Контроллер
      * @var string
      */
-    protected $_controller;
+    private $_controller;
 
     /**
      * Действие
      * @var string
      */
-    protected $_action;
+    private $_action;
 
     /**
      * Аргументы запроса
-     * Пример: <префикс>/<контроллер>/<действие>/<арг.1>/<арг.2>/...
      * @var mixed[]
      */
-    protected $_args = array();
+    private $_args = array();
 
     public function __construct($registry, $route) {
         $this->_registry = $registry;
         $this->_route    = $route;
 
-        $this->_prefixes = $this->_registry->config->url_prefixes;
+        $this->_prefixes = PsConfig::getInstance()->config->url_prefix;
     }
 
     /**
@@ -75,14 +84,14 @@ class PsRouter {
         $controllerName = ucfirst($this->_controller) . 'Controller';
 
         // Путь к директории с контроллерами
-        $controllersPath = SITEPATH . 'application/controllers/';
+        $controllersPath = APPLICATION_PATH . '/controllers/';
 
         // Путь к контроллеру
         $controllerFile = $controllersPath . $controllerName . '.php';
 
         // Если недоступен файл контроллера
         if (!is_readable($controllerFile)) {
-            die;
+            throw new BadControllerException;
         }
 
         // Подключаем контроллер
@@ -108,7 +117,7 @@ class PsRouter {
 
         // Если действие недоступно
         if (!is_callable(array($controller, $action))) {
-            die;
+            throw new BadActionException;
         }
 
         // Инициализируем контроллер, если надо
@@ -124,7 +133,7 @@ class PsRouter {
      * Определяет контроллер, действие и аргументы
      * Устанавливает свойства _controller, _action и _args
      */
-    protected function parseRoute() {
+    private function parseRoute() {
         $route = explode('/', $this->_route);
 
         // Префикс

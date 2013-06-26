@@ -5,5 +5,4 @@
  */
 
 class PsRegistry extends ArrayObject {
-
 }

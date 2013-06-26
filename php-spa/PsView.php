@@ -2,9 +2,10 @@
 /**
  * Класс для работы с шаблонами
  *
- * Передача в шаблон переменной test со значением 'test'
+ * Передача в шаблон переменной test со значением 'test':
  * $view->test = 'test'
- * Обращаться к переменным в шаблоне необходимо следующим образом
+ *
+ * Обращаться к переменным в шаблоне следующим образом:
  * $this->test
  *
  * @author ismd
@@ -16,13 +17,13 @@ class PsView {
 
     /**
      * Переменные шаблона
-     * @var array
+     * @var mixed[]
      */
     protected $_data = array();
 
     /**
      * JSON-данные для вывода при запросе действия
-     * @var array
+     * @var mixed[]
      */
     protected $_json = array();
 
@@ -44,7 +45,7 @@ class PsView {
     }
 
     public function __unset($name) {
-        if (false == isset($this->_data[$name])) {
+        if (!isset($this->_data[$name])) {
             return;
         }
 
@@ -55,7 +56,6 @@ class PsView {
      * Отображает страницу
      */
     public function render() {
-        // Отправляем заголовок с указанием кодировки
         header('Content-Type: text/html; charset=utf-8');
 
         $router = $this->_registry->router;
@@ -71,7 +71,7 @@ class PsView {
 
             default:
                 // Отображаем главную страницу
-                $filename = SITEPATH . 'application/views/layout.phtml';
+                $filename = APPLICATION_PATH . '/views/layout.phtml';
 
                 if (is_readable($filename)) {
                     require $filename;
@@ -87,7 +87,7 @@ class PsView {
         $router = $this->_registry->router;
 
         // Путь к директории с шаблонами
-        $viewsPath  = SITEPATH . 'application/views/';
+        $viewsPath  = APPLICATION_PATH . '/views/';
 
         // Путь к файлу шаблона
         $filename = $viewsPath . $router->getController()
@@ -108,7 +108,7 @@ class PsView {
     /**
      * Передача json-данных для вывода в шаблон
      * Можно использовать только при запросе действия
-     * @param array $json
+     * @param mixed[] $json
      * @return PsView
      */
     public function json($value) {

@@ -5,13 +5,17 @@
  * @author ismd
  */
 
-abstract class PsAbstractAuthController extends PsAbstractController {
+class UnauthorizedSessionException extends Exception {
+    protected $message = 'Неавторизованная сессия';
+}
+
+abstract class PsAuthController extends PsController {
 
     public function __construct($registry) {
         parent::__construct($registry);
 
-        if (is_null($this->session->user)) {
-            die;
+        if (is_null($this->getSession()->user)) {
+            throw new UnauthorizedSessionException;
         }
     }
 }

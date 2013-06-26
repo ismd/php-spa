@@ -1,8 +1,6 @@
 <?php
 /**
- * Класс запроса
  * Предоставляет доступ к данным запроса
- * Синглтон
  * @author ismd
  */
 
@@ -28,6 +26,13 @@ class PsRequest extends PsSingleton {
      */
     public function isPost() {
         return !empty($_POST);
+    }
+
+    /**
+     * @return PsRequest
+     */
+    public function getInstance() {
+        return parent::getInstance();
     }
 }
 
