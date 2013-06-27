@@ -35,6 +35,10 @@ class PsDb extends PsSingleton {
         }
     }
 
+    public function __destruct() {
+        $this->db->close();
+    }
+
     /**
      * @return PsDb
      */
