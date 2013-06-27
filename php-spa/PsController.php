@@ -16,9 +16,14 @@ abstract class PsController {
      */
     protected $view;
 
+    /**
+     * @var PsSession
+     */
+    private static $_session;
+
     public function __construct(PsRegistry $registry) {
         $this->registry = $registry;
-        $this->view      = $registry->view;
+        $this->view     = $registry->view;
     }
 
     /**
@@ -26,7 +31,11 @@ abstract class PsController {
      * @return PsSession
      */
     protected function getSession() {
-        return PsSession::getInstance();
+        if (is_null(self::$_session)) {
+            self::$_session = PsSession::getInstance();
+        }
+
+        return self::$_session;
     }
 
     /**
