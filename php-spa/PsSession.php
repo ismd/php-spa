@@ -21,7 +21,7 @@ class PsSession extends PsSingleton {
         return $this;
     }
 
-    private function __construct() {
+    protected function __construct() {
         session_start();
 
         foreach ($_SESSION as $key => $value) {
@@ -57,7 +57,7 @@ class PsSession extends PsSingleton {
     /**
      * @return PsSession
      */
-    public function getInstance() {
+    public static function getInstance() {
         return parent::getInstance();
     }
 }

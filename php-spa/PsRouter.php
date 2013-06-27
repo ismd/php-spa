@@ -70,7 +70,7 @@ class PsRouter {
         $this->_registry = $registry;
         $this->_route    = $route;
 
-        $this->_prefixes = PsConfig::getInstance()->config->url_prefix;
+        $this->_prefixes = PsConfig::getInstance()->config->url_prefixes;
     }
 
     /**
