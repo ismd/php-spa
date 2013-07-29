@@ -45,4 +45,12 @@ abstract class PsController {
     protected function getRequest() {
         return PsRequest::getInstance();
     }
+
+    /**
+     * Возвращает аргументы, переданные в url
+     * @return mixed[]
+     */
+    protected function getArgs() {
+        return $this->registry->router->getArgs();
+    }
 }
