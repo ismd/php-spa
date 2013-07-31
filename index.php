@@ -1,6 +1,4 @@
 <?php
-error_reporting(E_ALL ^ E_NOTICE ^ E_STRICT);
-
 // Определяем директорию с исходниками
 define('APPLICATION_PATH', realpath(dirname(__FILE__)) . '/../application');
 

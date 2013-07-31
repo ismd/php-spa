@@ -44,3 +44,23 @@ function __autoload($class) {
         require_once $file;
     }
 }
+
+// Определяем окружение
+switch (PsConfig::getInstance()->config->main->environment) {
+    case 'development':
+        error_reporting(E_ALL);
+        ini_set('display_errors', 'On');
+        ini_set('display_startup_errors', true);
+        break;
+
+    case 'production':
+    default:
+        error_reporting(E_ALL ^ E_NOTICE);
+        ini_set('display_errors', 'Off');
+        break;
+}
+
+ini_set('log_errors', true);
+if (isset(PsConfig::getInstance()->config->main->error_log)) {
+    ini_set('error_log', PsConfig::getInstance()->config->main->error_log);
+}
