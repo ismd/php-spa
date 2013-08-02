@@ -33,6 +33,8 @@ class PsDb extends PsSingleton {
         if ($this->db->connect_error) {
             throw new DbCantConnectException;
         }
+
+        $this->db->query('SET NAMES UTF8');
     }
 
     public function __destruct() {
