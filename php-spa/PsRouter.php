@@ -150,7 +150,9 @@ class PsRouter {
 
         // Действие
         if (count($route) > 2) {
-            $this->_action = strtolower($route[2]);
+            $actionExplode = explode('-', str_replace('_', '-', $route[2]));
+            $this->_action = $actionExplode[0]
+                . implode(array_map(create_function('$a', 'return ucfirst($a);'), array_slice($actionExplode, 1)));
         } else {
             $this->_action = 'index';
         }
