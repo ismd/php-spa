@@ -5,7 +5,7 @@
  */
 
 class DbCantConnectException extends Exception {
-    protected $message = 'Не удалось подключиться к БД';
+    protected $message = "Can't connect to database";
 }
 
 class PsDb extends PsSingleton {

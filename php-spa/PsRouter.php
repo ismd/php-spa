@@ -20,11 +20,11 @@
  */
 
 class BadControllerException extends Exception {
-    protected $message = 'Не найден контроллер';
+    protected $message = 'Controller not found';
 }
 
 class BadActionException extends Exception {
-    protected $message = 'Не найдено действие';
+    protected $message = 'Action not found';
 }
 
 class PsRouter {

@@ -4,7 +4,7 @@
  */
 
 class InvalidPropertyException extends Exception {
-    protected $message = 'Неверное свойство';
+    protected $message = 'Bad property';
 }
 
 abstract class PsObject {

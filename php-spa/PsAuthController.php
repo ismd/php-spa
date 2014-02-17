@@ -6,7 +6,7 @@
  */
 
 class UnauthorizedSessionException extends Exception {
-    protected $message = 'Неавторизованная сессия';
+    protected $message = 'Unauthorized session';
 }
 
 abstract class PsAuthController extends PsController {

@@ -5,7 +5,7 @@
  */
 
 class ConfigCantReadException extends Exception {
-    protected $message = 'Не удалось прочитать конфигурационный файл';
+    protected $message = "Can't read config file";
 }
 
 class PsConfig extends PsSingleton {
@@ -14,7 +14,7 @@ class PsConfig extends PsSingleton {
      * Путь к главному конфигурационному файлу
      * @var string
      */
-    private $_filename = '/configs/application.ini';
+    const FILENAME = '/configs/application.ini';
 
     /**
      * Объект конфига
@@ -27,7 +27,7 @@ class PsConfig extends PsSingleton {
      * @throws ConfigCantReadException
      */
     protected function __construct() {
-        $filename = APPLICATION_PATH . $this->_filename;
+        $filename = APPLICATION_PATH . self::FILENAME;
 
         if (!is_readable($filename)) {
             throw new ConfigCantReadException;
