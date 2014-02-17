@@ -9,14 +9,16 @@ abstract class PsDbMapper extends PsMapper {
     /**
      * @var mysqli
      */
-    protected $db;
+    protected static $db;
 
     /**
      * Подключается к БД
      * @throws Exception
      */
     protected function __construct() {
-        $this->db = PsDb::getInstance()->db;
+        if (is_null(self::$db)) {
+            self::$db = PsDb::getInstance()->db;
+        }
     }
 
     /**
