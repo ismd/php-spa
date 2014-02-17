@@ -10,14 +10,14 @@ class PsSession extends PsSingleton {
      * Данные в сессии
      * @var mixed[]
      */
-    private $_data = array();
+    private $_data = [];
 
     /**
      * Очищает сессию
      * @return PsSession
      */
     public function clear() {
-        $this->_data = array();
+        $this->_data = [];
         return $this;
     }
 
@@ -30,7 +30,7 @@ class PsSession extends PsSingleton {
     }
 
     public function __destruct() {
-        $_SESSION = array();
+        $_SESSION = [];
 
         foreach ($this->_data as $key => $value) {
             $_SESSION[$key] = serialize($value);

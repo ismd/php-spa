@@ -19,13 +19,13 @@ class PsView {
      * Переменные шаблона
      * @var mixed[]
      */
-    protected $_data = array();
+    protected $_data = [];
 
     /**
      * JSON-данные для вывода при запросе действия
      * @var mixed[]
      */
-    protected $_json = array();
+    protected $_json = [];
 
     public function __construct($registry) {
         $this->_registry = $registry;

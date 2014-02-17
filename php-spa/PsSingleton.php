@@ -9,7 +9,7 @@ abstract class PsSingleton {
     /**
      * @var object[] Массив созданных объектов
      */
-    private static $_instances = array();
+    private static $_instances = [];
 
     private function __construct() {
     }

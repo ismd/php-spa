@@ -64,7 +64,7 @@ class PsRouter {
      * Аргументы запроса
      * @var mixed[]
      */
-    private $_args = array();
+    private $_args = [];
 
     public function __construct($registry, $route) {
         $this->_registry = $registry;
