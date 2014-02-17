@@ -11,6 +11,14 @@
  * @author ismd
  */
 
+class LayoutNotFoundException extends Exception {
+    protected $message = 'Layout not found';
+}
+
+class PartialNotFoundException extends Exception {
+    protected $message = 'Partial not found';
+}
+
 class PsView {
 
     protected $_registry;
@@ -71,11 +79,13 @@ class PsView {
 
             default:
                 // Отображаем главную страницу
-                $filename = APPLICATION_PATH . '/views/layout.phtml';
+                $filename = APPLICATION_PATH . '/views/index.phtml';
 
-                if (is_readable($filename)) {
-                    require $filename;
+                if (!is_readable($filename)) {
+                    throw new LayoutNotFoundException;
                 }
+
+                require $filename;
                 break;
         }
     }
@@ -93,9 +103,11 @@ class PsView {
         $filename = $viewsPath . $router->getController()
             . '/' . $router->getAction() . '.phtml';
 
-        if (is_readable($filename)) {
-            require $filename;
+        if (!is_readable($filename)) {
+            throw new PartialNotFoundException;
         }
+
+        require $filename;
     }
 
     /**
