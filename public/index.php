@@ -14,7 +14,10 @@ require 'php-spa/startup.php';
 $registry = new PsRegistry;
 
 // Устанавливаем временную зону сервера
-date_default_timezone_set(PsConfig::getInstance()->config->timezone->server);
+$config = PsConfig::getInstance()->config;
+if (isset($config->timezone->server)) {
+    date_default_timezone_set($config->timezone->server);
+}
 
 // Загружаем router
 $registry->router = new PsRouter($registry, $_GET['route']);
