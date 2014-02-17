@@ -4,10 +4,6 @@
  * @author ismd
  */
 
-class DbCantConnectException extends Exception {
-    protected $message = "Can't connect to database";
-}
-
 class PsDb extends PsSingleton {
 
     /**
@@ -18,7 +14,7 @@ class PsDb extends PsSingleton {
 
     /**
      * Подключается к БД
-     * @throws DbCantConnectException
+     * @throws Exception
      */
     protected function __construct() {
         $config = PsConfig::getInstance()->config->database;
@@ -31,7 +27,7 @@ class PsDb extends PsSingleton {
         );
 
         if ($this->db->connect_error) {
-            throw new DbCantConnectException;
+            throw new Exception("Can't connect to database");
         }
 
         $this->db->query('SET NAMES UTF8');

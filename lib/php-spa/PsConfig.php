@@ -4,10 +4,6 @@
  * @author ismd
  */
 
-class ConfigCantReadException extends Exception {
-    protected $message = "Can't read config file";
-}
-
 class PsConfig extends PsSingleton {
 
     /**
@@ -24,23 +20,25 @@ class PsConfig extends PsSingleton {
 
     /**
      * Читает конфигурационный файл
-     * @throws ConfigCantReadException
+     * @throws Exception
      */
     protected function __construct() {
         $filename = APPLICATION_PATH . self::FILENAME;
 
         if (!is_readable($filename)) {
-            throw new ConfigCantReadException;
+            throw new Exception("Can't read config file");
         }
 
         $config = parse_ini_file($filename, true);
 
         if (!$config) {
-            throw new ConfigCantReadException;
+            throw new Exception("Can't read config file");
         }
 
         // Преобразуем все элементы к объектам
-        array_walk($config, create_function('&$val', '$val = (object)$val;'));
+        array_walk($config, function($val) {
+            return (object)$val;
+        });
 
         $this->config = (object)$config;
     }

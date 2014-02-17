@@ -11,14 +11,6 @@
  * @author ismd
  */
 
-class LayoutNotFoundException extends Exception {
-    protected $message = 'Layout not found';
-}
-
-class PartialNotFoundException extends Exception {
-    protected $message = 'Partial not found';
-}
-
 class PsView {
 
     protected $_registry;
@@ -62,6 +54,7 @@ class PsView {
 
     /**
      * Отображает страницу
+     * @throws Exception
      */
     public function render() {
         header('Content-Type: text/html; charset=utf-8');
@@ -82,7 +75,7 @@ class PsView {
                 $filename = APPLICATION_PATH . '/views/index.phtml';
 
                 if (!is_readable($filename)) {
-                    throw new LayoutNotFoundException;
+                    throw new Exception('Layout not found');
                 }
 
                 require $filename;
@@ -92,6 +85,7 @@ class PsView {
 
     /**
      * Выводит содержимое запрошенной страницы
+     * @throws Exception
      */
     protected function renderPartial() {
         $router = $this->_registry->router;
@@ -104,7 +98,7 @@ class PsView {
             . '/' . $router->getAction() . '.phtml';
 
         if (!is_readable($filename)) {
-            throw new PartialNotFoundException;
+            throw new Exception('Partial not found');
         }
 
         require $filename;

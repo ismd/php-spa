@@ -21,6 +21,9 @@ abstract class PsController {
      */
     private static $_session;
 
+    /**
+     * @param PsRegistry $registry
+     */
     public function __construct(PsRegistry $registry) {
         $this->registry = $registry;
         $this->view     = $registry->view;

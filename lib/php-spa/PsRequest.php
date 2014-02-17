@@ -13,7 +13,7 @@ class PsRequest extends PsSingleton {
      * return PsPostRequest
      */
     public function getPost() {
-        if (null == $this->_post) {
+        if (is_null($this->_post)) {
             $this->_post = new PsPostRequest;
         }
 
@@ -41,10 +41,18 @@ class PsRequest extends PsSingleton {
  */
 class PsPostRequest {
 
+    /**
+     * @param string $name
+     * @return mixed
+     */
     public function __get($name) {
         return $_POST[$name];
     }
 
+    /**
+     * @param string $name
+     * @return boolean
+     */
     public function __isset($name) {
         return isset($_POST[$name]);
     }

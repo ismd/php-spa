@@ -13,7 +13,7 @@ abstract class PsDbMapper extends PsMapper {
 
     /**
      * Подключается к БД
-     * @throws DbCantConnectException
+     * @throws Exception
      */
     protected function __construct() {
         $this->db = PsDb::getInstance()->db;

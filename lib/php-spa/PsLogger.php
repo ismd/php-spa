@@ -10,9 +10,14 @@ class PsLogger extends PsSingleton {
 
     /**
      * @global PsRegistry $registry
+     * @throws Exception
      */
     protected function __construct() {
         $this->_file = fopen(PsConfig::getInstance()->config->log->filename, 'a');
+
+        if (!$this->_file) {
+            throw new Exception("Can't open log file");
+        }
     }
 
     public function __destruct() {

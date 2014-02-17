@@ -19,14 +19,6 @@
  * @author ismd
  */
 
-class BadControllerException extends Exception {
-    protected $message = 'Controller not found';
-}
-
-class BadActionException extends Exception {
-    protected $message = 'Action not found';
-}
-
 class PsRouter {
 
     const INDEX_REQUEST   = 1;
@@ -78,6 +70,7 @@ class PsRouter {
 
     /**
      * Подключаем нужный контроллер, модель и выполняем действие
+     * @throws Exception
      */
     public function delegate() {
         // Анализируем путь
@@ -94,7 +87,7 @@ class PsRouter {
 
         // Если недоступен файл контроллера
         if (!is_readable($controllerFile)) {
-            throw new BadControllerException;
+            throw new Exception('Controller not found');
         }
 
         // Подключаем контроллер
@@ -120,7 +113,7 @@ class PsRouter {
 
         // Если действие недоступно
         if (!is_callable(array($controller, $action))) {
-            throw new BadActionException;
+            throw new Exception('Action not found');
         }
 
         // Инициализируем контроллер, если надо
@@ -155,7 +148,9 @@ class PsRouter {
         if (count($route) > 2) {
             $actionExplode = explode('-', str_replace('_', '-', $route[2]));
             $this->_action = $actionExplode[0]
-                . implode(array_map(create_function('$a', 'return ucfirst($a);'), array_slice($actionExplode, 1)));
+                . implode(array_map(function($val) {
+                    return ucfirst($val);
+                }, array_slice($actionExplode, 1)));
         } else {
             $this->_action = 'index';
         }

@@ -5,17 +5,17 @@
  * @author ismd
  */
 
-class UnauthorizedSessionException extends Exception {
-    protected $message = 'Unauthorized session';
-}
-
 abstract class PsAuthController extends PsController {
 
-    public function __construct($registry) {
+    /**
+     * @param PsRegistry $registry
+     * @throws Exception
+     */
+    public function __construct(PsRegistry $registry) {
         parent::__construct($registry);
 
         if (is_null($this->getSession()->user)) {
-            throw new UnauthorizedSessionException;
+            throw new Exception('Unauthorized session');
         }
     }
 }
