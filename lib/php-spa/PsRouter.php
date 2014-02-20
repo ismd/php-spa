@@ -141,7 +141,7 @@ class PsRouter {
         if (is_null($this->_prefixes) || !in_array($this->_prefix, (array)$this->_prefixes)) {
             // Определяем контроллер и действие ошибки
             $config = PsConfig::getInstance()->config;
-            $error = isset($config->error) ? $config->error : null;
+            $error = isset($config->error) ? (object)$config->error : null;
             $this->_controller = isset($error->controller) ? $error->controller : self::ERROR_CONTROLLER;
             $this->_action     = isset($error->action)     ? $error->action     : self::ERROR_ACTION;
             return;
