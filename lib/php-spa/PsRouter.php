@@ -26,6 +26,9 @@ class PsRouter {
     const ACTION_REQUEST  = 3;
     const NON_SPA         = 4;
 
+    const ERROR_CONTROLLER = 'Error';
+    const ERROR_ACTION     = 'index';
+
     private $_registry;
     private $_route;
 
@@ -135,9 +138,12 @@ class PsRouter {
         // Префикс
         $this->_prefix = $route[0];
 
-        if (!in_array($this->_prefix, (array)$this->_prefixes)) {
-            $this->_controller = 'index';
-            $this->_action     = 'index';
+        if (is_null($this->_prefixes) || !in_array($this->_prefix, (array)$this->_prefixes)) {
+            // Определяем контроллер и действие ошибки
+            $config = PsConfig::getInstance()->config;
+            $error = isset($config->error) ? $config->error : null;
+            $this->_controller = isset($error->controller) ? $error->controller : self::ERROR_CONTROLLER;
+            $this->_action     = isset($error->action)     ? $error->action     : self::ERROR_ACTION;
             return;
         }
 

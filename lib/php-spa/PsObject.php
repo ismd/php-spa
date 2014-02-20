@@ -11,7 +11,9 @@ abstract class PsObject {
      */
     public function __construct($options = null) {
         // Сразу инициализируем объект данными
-        $this->setOptions($options);
+        if (is_array($options)) {
+            $this->setOptions($options);
+        }
     }
 
     /**

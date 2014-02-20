@@ -22,6 +22,12 @@ class PsView {
     protected $_data = [];
 
     /**
+     * Флаг вывода
+     * @var boolean
+     */
+    private $_rendered = false;
+
+    /**
      * JSON-данные для вывода при запросе действия
      * @var mixed[]
      */
@@ -54,13 +60,23 @@ class PsView {
 
     /**
      * Отображает страницу
+     * @param string $partial Если передан параметр, то выводим заданный шаблон
      * @throws Exception
      */
-    public function render() {
+    public function render($partial = null) {
+        if ($this->_rendered) {
+            return;
+        }
+
         header('Content-Type: text/html; charset=utf-8');
 
-        $router = $this->_registry->router;
+        if (!is_null($partial)) {
+            $this->renderPartial($partial);
+            $this->_rendered = true;
+            return;
+        }
 
+        $router = $this->_registry->router;
         switch ($router->getRequestType()) {
             case PsRouter::PARTIAL_REQUEST:
                 $this->renderPartial();
@@ -85,13 +101,24 @@ class PsView {
 
     /**
      * Выводит содержимое запрошенной страницы
+     * @param string $partial Если передан параметр, то выводим заданный шаблон
      * @throws Exception
      */
-    protected function renderPartial() {
-        $router = $this->_registry->router;
-
+    protected function renderPartial($partial = null) {
         // Путь к директории с шаблонами
         $viewsPath  = APPLICATION_PATH . '/views/';
+
+        if (!is_null($partial)) {
+            $filename = $viewsPath . $partial . '.phtml';
+
+            if (is_readable($filename)) {
+                require $filename;
+            } else {
+                throw new Exception('Partial not found');
+            }
+        }
+
+        $router = $this->_registry->router;
 
         // Путь к файлу шаблона
         $filename = $viewsPath . $router->getController()
