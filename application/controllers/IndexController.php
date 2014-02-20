@@ -6,6 +6,6 @@
 
 class IndexController extends PsController {
 
-    public function index() {
+    public function indexAction() {
     }
 }

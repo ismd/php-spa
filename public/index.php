@@ -20,7 +20,7 @@ if (isset($config->timezone->server)) {
 }
 
 // Загружаем router
-$registry->router = new PsRouter($registry, $_GET['route']);
+$registry->router = new PsRouter($registry, isset($_GET['route']) ? $_GET['route'] : '');
 
 // Загружаем класс для работы с шаблонами
 $registry->view = new PsView($registry);

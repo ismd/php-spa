@@ -77,39 +77,30 @@ class PsRouter {
      */
     public function delegate() {
         // Анализируем путь
-        $this->parseRoute();
-
-        // Имя класса контроллера
-        $controllerName = ucfirst($this->_controller) . 'Controller';
-
-        // Путь к директории с контроллерами
-        $controllersPath = APPLICATION_PATH . '/controllers/';
-
-        // Путь к контроллеру
-        $controllerFile = $controllersPath . $controllerName . '.php';
-
-        // Если недоступен файл контроллера
-        if (!is_readable($controllerFile)) {
-            throw new Exception('Controller not found');
+        try {
+            $this->parseRoute();
+        } catch (Exception $e) {
+            $this->setErrorControllerAndAction();
         }
 
         // Подключаем контроллер
-        require_once $controllerFile;
-
-        // Создаём экземпляр контроллера
-        $controller = new $controllerName($this->_registry);
+        try {
+            $controller = $this->includeController($this->_controller);
+        } catch (Exception $e) {
+            $this->setErrorControllerAndAction();
+            $controller = $this->includeController($this->_controller);
+        }
 
         // Определяем вызываемый метод
         $action = $this->_action;
 
         $requestType = $this->getRequestType();
-
         switch ($requestType) {
             case self::PARTIAL_REQUEST:
                 $action .= 'Partial';
                 break;
 
-            case self::ACTION_REQUEST:
+            default:
                 $action .= 'Action';
                 break;
         }
@@ -129,30 +120,59 @@ class PsRouter {
     }
 
     /**
+     * Подключает контроллер
+     * @param string $controller
+     * @return PsController
+     * @throws Exception
+     */
+    private function includeController($controller) {
+        $controller .=  'Controller';
+
+        // Путь к директории с контроллерами
+        $controllersPath = APPLICATION_PATH . '/controllers/';
+
+        // Путь к контроллеру
+        $controllerFile = $controllersPath . $controller . '.php';
+
+        // Если недоступен файл контроллера
+        if (!is_readable($controllerFile)) {
+            throw new Exception('Controller not found');
+        }
+
+        // Подключаем контроллер
+        require_once $controllerFile;
+
+        // Создаём экземпляр контроллера
+        return new $controller($this->_registry);
+    }
+
+    /**
      * Определяет контроллер, действие и аргументы
      * Устанавливает свойства _controller, _action и _args
+     * @throws Exception
      */
     private function parseRoute() {
         $route = explode('/', $this->_route);
 
         // Префикс
-        $this->_prefix = $route[0];
+        if (!is_null($this->_prefixes)) {
+            $this->_prefix = $route[0];
 
-        if (is_null($this->_prefixes) || !in_array($this->_prefix, (array)$this->_prefixes)) {
-            // Определяем контроллер и действие ошибки
-            $config = PsConfig::getInstance()->config;
-            $error = isset($config->error) ? (object)$config->error : null;
-            $this->_controller = isset($error->controller) ? $error->controller : self::ERROR_CONTROLLER;
-            $this->_action     = isset($error->action)     ? $error->action     : self::ERROR_ACTION;
-            return;
+            if (!in_array($this->_prefix, $this->_prefixes)) {
+                throw new Exception('Bad route');
+            }
+
+            $controllerId = 1;
+        } else {
+            $controllerId = 0;
         }
 
         // Контроллер
-        $this->_controller = strtolower($route[1]);
+        $this->_controller = '' != $route[$controllerId] ? ucfirst(strtolower($route[$controllerId])) : 'Index';
 
         // Действие
-        if (count($route) > 2) {
-            $actionExplode = explode('-', str_replace('_', '-', $route[2]));
+        if (count($route) > $controllerId + 1) {
+            $actionExplode = explode('-', str_replace('_', '-', $route[$controllerId + 1]));
             $this->_action = $actionExplode[0]
                 . implode(array_map(function($val) {
                     return ucfirst($val);
@@ -162,7 +182,7 @@ class PsRouter {
         }
 
         // Аргументы
-        $this->_args = array_slice($route, 3);
+        $this->_args = array_slice($route, $controllerId + 2);
     }
 
     /**
@@ -209,5 +229,15 @@ class PsRouter {
         } else {
             return self::INDEX_REQUEST;
         }
+    }
+
+    /**
+     * Устанавливает контроллер и действие ошибки
+     */
+    private function setErrorControllerAndAction() {
+        $config = PsConfig::getInstance()->config;
+        $error = isset($config->error) ? (object)$config->error : null;
+        $this->_controller = isset($error->controller) ? ucfirst($error->controller) : self::ERROR_CONTROLLER;
+        $this->_action     = isset($error->action)     ? $error->action              : self::ERROR_ACTION;
     }
 }

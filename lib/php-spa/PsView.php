@@ -113,6 +113,7 @@ class PsView {
 
             if (is_readable($filename)) {
                 require $filename;
+                return;
             } else {
                 throw new Exception('Partial not found');
             }

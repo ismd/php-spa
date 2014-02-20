@@ -5,7 +5,7 @@
 
 class ErrorController extends PsController {
 
-    public function index() {
+    public function indexAction() {
         $this->view->render('error');
     }
 }
