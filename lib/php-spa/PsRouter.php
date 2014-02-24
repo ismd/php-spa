@@ -66,8 +66,9 @@ class PsRouter {
         $this->_registry = $registry;
         $this->_route    = $route;
 
-        if (isset(PsConfig::getInstance()->config->url_prefixes)) {
-            $this->_prefixes = PsConfig::getInstance()->config->url_prefixes;
+        $config = PsConfig::getInstance();
+        if (!empty($config->url_prefixes)) {
+            $this->_prefixes = $config->url_prefixes;
         }
     }
 
@@ -235,9 +236,8 @@ class PsRouter {
      * Устанавливает контроллер и действие ошибки
      */
     private function setErrorControllerAndAction() {
-        $config = PsConfig::getInstance()->config;
-        $error = isset($config->error) ? (object)$config->error : null;
-        $this->_controller = isset($error->controller) ? ucfirst($error->controller) : self::ERROR_CONTROLLER;
-        $this->_action     = isset($error->action)     ? $error->action              : self::ERROR_ACTION;
+        $error = PsConfig::getInstance()->error;
+        $this->_controller = !is_null($error->controller) ? ucfirst($error->controller) : self::ERROR_CONTROLLER;
+        $this->_action     = !is_null($error->action)     ? $error->action              : self::ERROR_ACTION;
     }
 }

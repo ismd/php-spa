@@ -16,7 +16,7 @@ class PsConfig extends PsSingleton {
      * Объект конфига
      * @var object
      */
-    public $config;
+    protected $_config;
 
     /**
      * Читает конфигурационный файл
@@ -40,7 +40,11 @@ class PsConfig extends PsSingleton {
             return (object)$val;
         });
 
-        $this->config = (object)$config;
+        $this->_config = (object)$config;
+    }
+
+    public function __get($name) {
+        return new PsConfigSection(isset($this->_config->$name) ? $this->_config->$name : null);
     }
 
     /**
@@ -48,5 +52,22 @@ class PsConfig extends PsSingleton {
      */
     public static function getInstance() {
         return parent::getInstance();
+    }
+}
+
+class PsConfigSection {
+
+    protected $_value;
+
+    public function __construct($value) {
+        $this->_value = $value;
+    }
+
+    public function __get($name) {
+        if (is_null($this->_value) || !isset($this->_value->$name)) {
+            return null;
+        }
+
+        return $this->_value->$name;
     }
 }

@@ -13,7 +13,13 @@ class PsLogger extends PsSingleton {
      * @throws Exception
      */
     protected function __construct() {
-        $this->_file = fopen(PsConfig::getInstance()->config->log->filename, 'a');
+        $filename = PsConfig::getInstance()->log->filename;
+
+        if (is_null($filename)) {
+            throw new Exception('Log filename is empty');
+        }
+
+        $this->_file = fopen($filename, 'a');
 
         if (!$this->_file) {
             throw new Exception("Can't open log file");

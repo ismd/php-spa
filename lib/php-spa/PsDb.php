@@ -17,7 +17,7 @@ class PsDb extends PsSingleton {
      * @throws Exception
      */
     protected function __construct() {
-        $config = PsConfig::getInstance()->config->database;
+        $config = PsConfig::getInstance()->database;
 
         $this->db = new mysqli(
             $config->host,

@@ -14,8 +14,8 @@ require 'php-spa/startup.php';
 $registry = new PsRegistry;
 
 // Устанавливаем временную зону сервера
-$config = PsConfig::getInstance()->config;
-if (isset($config->timezone->server)) {
+$config = PsConfig::getInstance();
+if (!is_null($config->timezone->server)) {
     date_default_timezone_set($config->timezone->server);
 }
 
