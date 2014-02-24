@@ -79,6 +79,7 @@ class PsView {
         $router = $this->_registry->router;
         switch ($router->getRequestType()) {
             case PsRouter::PARTIAL_REQUEST:
+            case PsRouter::NON_SPA:
                 $this->renderPartial();
                 break;
 
@@ -122,7 +123,7 @@ class PsView {
         $router = $this->_registry->router;
 
         // Путь к файлу шаблона
-        $filename = $viewsPath . $router->getController()
+        $filename = $viewsPath . lcfirst($router->getController())
             . '/' . $router->getAction() . '.phtml';
 
         if (!is_readable($filename)) {
