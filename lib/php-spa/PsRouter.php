@@ -81,15 +81,16 @@ class PsRouter {
         try {
             $this->parseRoute();
         } catch (Exception $e) {
-            $this->setErrorControllerAndAction();
+            $this->showErrorPage();
+            return;
         }
 
         // Подключаем контроллер
         try {
             $controller = $this->includeController($this->_controller);
         } catch (Exception $e) {
-            $this->setErrorControllerAndAction();
-            $controller = $this->includeController($this->_controller);
+            $this->showErrorPage();
+            return;
         }
 
         // Определяем вызываемый метод
@@ -108,7 +109,8 @@ class PsRouter {
 
         // Если действие недоступно
         if (!is_callable(array($controller, $action))) {
-            throw new Exception('Action not found');
+            $this->showErrorPage();
+            return;
         }
 
         // Инициализируем контроллер, если надо
@@ -117,7 +119,11 @@ class PsRouter {
         }
 
         // Выполняем действие
-        $controller->$action();
+        try {
+            $controller->$action();
+        } catch (Exception $e) {
+            $this->showErrorPage();
+        }
     }
 
     /**
@@ -145,6 +151,33 @@ class PsRouter {
 
         // Создаём экземпляр контроллера
         return new $controller($this->_registry);
+    }
+
+    /**
+     * Отображает страницу ошибки
+     * @throws Exception
+     */
+    private function showErrorPage() {
+        $error = PsConfig::getInstance()->error;
+
+        $this->_controller = !is_null($error->controller) ? ucfirst($error->controller) : self::ERROR_CONTROLLER;
+        $this->_action     = !is_null($error->action)     ? $error->action              : self::ERROR_ACTION;
+
+        $controller = $this->includeController($this->_controller);
+        $action     = $this->_action . 'Action';
+
+        // Если действие недоступно
+        if (!is_callable(array($controller, $action))) {
+            throw new Exception('Action not found');
+        }
+
+        // Инициализируем контроллер, если надо
+        if (is_callable(array($controller, 'init'))) {
+            $controller->init();
+        }
+
+        // Выполняем действие
+        $controller->$action();
     }
 
     /**
@@ -220,7 +253,7 @@ class PsRouter {
      */
     public function getRequestType() {
         if (is_null($this->_prefixes)) {
-            return self::NON_SPA;
+            return '' == $this->_route ? self::INDEX_REQUEST : self::NON_SPA;
         }
 
         if ($this->_prefix == $this->_prefixes->partial) {
@@ -230,14 +263,5 @@ class PsRouter {
         } else {
             return self::INDEX_REQUEST;
         }
-    }
-
-    /**
-     * Устанавливает контроллер и действие ошибки
-     */
-    private function setErrorControllerAndAction() {
-        $error = PsConfig::getInstance()->error;
-        $this->_controller = !is_null($error->controller) ? ucfirst($error->controller) : self::ERROR_CONTROLLER;
-        $this->_action     = !is_null($error->action)     ? $error->action              : self::ERROR_ACTION;
     }
 }
