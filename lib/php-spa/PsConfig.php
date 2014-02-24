@@ -44,7 +44,7 @@ class PsConfig extends PsSingleton {
     }
 
     public function __get($name) {
-        return new PsConfigSection(isset($this->_config->$name) ? $this->_config->$name : null);
+        return new PsConfigSection(isset($this->_config->$name) ? (object)$this->_config->$name : null);
     }
 
     /**
@@ -59,7 +59,7 @@ class PsConfigSection {
 
     protected $_value;
 
-    public function __construct($value) {
+    public function __construct(object $value) {
         $this->_value = $value;
     }
 
