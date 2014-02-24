@@ -36,15 +36,15 @@ class PsConfig extends PsSingleton {
         }
 
         // Преобразуем все элементы к объектам
-        array_walk($config, function($val) {
-            return (object)$val;
+        array_walk($config, function(&$val) {
+            $val = (object)$val;
         });
 
         $this->_config = (object)$config;
     }
 
     public function __get($name) {
-        return new PsConfigSection(isset($this->_config->$name) ? (object)$this->_config->$name : null);
+        return new PsConfigSection(isset($this->_config->$name) ? $this->_config->$name : null);
     }
 
     /**
@@ -59,7 +59,7 @@ class PsConfigSection {
 
     protected $_value;
 
-    public function __construct(object $value) {
+    public function __construct($value) {
         $this->_value = $value;
     }
 
