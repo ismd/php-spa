@@ -4,5 +4,5 @@
  * @author ismd
  */
 
-class PsRegistry extends ArrayObject {
+class PsRegistry extends PsObject {
 }

@@ -6,41 +6,36 @@
 abstract class PsObject {
 
     /**
-     * @param mixed[] $options
-     * @throws Exception
+     * @var mixed[]
      */
-    public function __construct($options = null) {
-        // Сразу инициализируем объект данными
-        if (is_array($options)) {
-            $this->setOptions($options);
+    protected $_data = [];
+
+    public function __set($name, $value) {
+        $this->_data[$name] = $value;
+        return $this;
+    }
+
+    public function __get($name) {
+        return isset($this->_data[$name]) ? $this->_data[$name] : null;
+    }
+
+    public function __isset($name) {
+        return isset($this->_data[$name]);
+    }
+
+    public function __unset($name) {
+        if (!isset($this->_data[$name])) {
+            return;
         }
+
+        unset($this->_data[$name]);
     }
 
     /**
-     * Инициализация объекта из массива
-     * @param mixed[] $options
      * @return PsObject
-     * @throws Exception
      */
-    public function setOptions(array $options) {
-        foreach ($options as $name => $value) {
-            $method = explode('_', $name);
-
-            // ucfirst для всех элементов
-            array_walk($method, function($val) {
-                return ucfirst($val);
-            });
-
-            // Имя метода в стиле camelCase
-            $method = 'set' . implode($method);
-
-            if (!method_exists($this, $method)) {
-                throw new Exception('Bad property');
-            }
-
-            $this->$method($value);
-        }
-
+    public function clear() {
+        $this->_data = [];
         return $this;
     }
 }

@@ -11,15 +11,9 @@
  * @author ismd
  */
 
-class PsView {
+class PsView extends PsObject {
 
     protected $_registry;
-
-    /**
-     * Переменные шаблона
-     * @var mixed[]
-     */
-    protected $_data = [];
 
     /**
      * Флаг вывода
@@ -33,29 +27,14 @@ class PsView {
      */
     protected $_json = [];
 
+    /**
+     * Имя шаблона
+     * @var string
+     */
+    protected $_partial;
+
     public function __construct($registry) {
         $this->_registry = $registry;
-    }
-
-    public function __set($name, $value) {
-        $this->_data[$name] = $value;
-        return $this;
-    }
-
-    public function __get($name) {
-        return $this->_data[$name];
-    }
-
-    public function __isset($name) {
-        return isset($this->_data[$name]);
-    }
-
-    public function __unset($name) {
-        if (!isset($this->_data[$name])) {
-            return;
-        }
-
-        unset($this->_data[$name]);
     }
 
     /**
@@ -68,49 +47,42 @@ class PsView {
             return;
         }
 
+        $this->_partial = $partial;
         header('Content-Type: text/html; charset=utf-8');
 
-        if (!is_null($partial)) {
-            $this->renderPartial($partial);
-            $this->_rendered = true;
-            return;
+        if (is_null($partial)) {
+            switch ($this->_registry->router->getRequestType()) {
+                case PsRouter::PARTIAL_REQUEST:
+                    $this->content();
+                    return;
+
+                case PsRouter::ACTION_REQUEST:
+                    echo json_encode($this->_json);
+                    return;
+            }
         }
 
-        $router = $this->_registry->router;
-        switch ($router->getRequestType()) {
-            case PsRouter::PARTIAL_REQUEST:
-            case PsRouter::NON_SPA:
-                $this->renderPartial();
-                break;
+        // Отображаем главную страницу
+        $filename = APPLICATION_PATH . '/views/layout.phtml';
 
-            case PsRouter::ACTION_REQUEST:
-                $this->renderJson();
-                break;
-
-            default:
-                // Отображаем главную страницу
-                $filename = APPLICATION_PATH . '/views/index.phtml';
-
-                if (!is_readable($filename)) {
-                    throw new Exception('Layout not found');
-                }
-
-                require $filename;
-                break;
+        if (!is_readable($filename)) {
+            throw new Exception('Layout not found');
         }
+
+        require $filename;
+        $this->_rendered = true;
     }
 
     /**
-     * Выводит содержимое запрошенной страницы
-     * @param string $partial Если передан параметр, то выводим заданный шаблон
+     * Выводит шаблон
      * @throws Exception
      */
-    protected function renderPartial($partial = null) {
+    protected function content() {
         // Путь к директории с шаблонами
-        $viewsPath  = APPLICATION_PATH . '/views/';
+        $viewsPath = APPLICATION_PATH . '/views/';
 
-        if (!is_null($partial)) {
-            $filename = $viewsPath . $partial . '.phtml';
+        if (!is_null($this->_partial)) {
+            $filename = $viewsPath . $this->_partial . '.phtml';
 
             if (is_readable($filename)) {
                 require $filename;
@@ -131,13 +103,6 @@ class PsView {
         }
 
         require $filename;
-    }
-
-    /**
-     * Отображает json-данные
-     */
-    protected function renderJson() {
-        echo json_encode($this->_json);
     }
 
     /**
