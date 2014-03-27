@@ -60,6 +60,11 @@ class PsView extends PsObject {
                     echo json_encode($this->_json);
                     return;
             }
+
+            if (!empty($this->_json)) {
+                echo json_encode($this->_json);
+                return;
+            }
         }
 
         // Отображаем главную страницу
