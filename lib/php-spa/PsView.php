@@ -59,6 +59,12 @@ class PsView extends PsObject {
                 case PsRouter::ACTION_REQUEST:
                     echo json_encode($this->_json);
                     return;
+
+                case PsRouter::NON_SPA:
+                    if (!empty($this->_json)) {
+                        echo json_encode($this->_json);
+                        return;
+                    }
             }
         }
 
