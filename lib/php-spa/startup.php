@@ -66,3 +66,24 @@ ini_set('log_errors', true);
 if (!is_null($configMain->error_log)) {
     ini_set('error_log', $configMain->error_log);
 }
+
+// PsRegistry, в котором будем хранить глобальные значения
+$registry = new PsRegistry;
+
+// Устанавливаем временную зону сервера
+$config = PsConfig::getInstance();
+if (!is_null($config->timezone->server)) {
+    date_default_timezone_set($config->timezone->server);
+}
+
+// Загружаем router
+$registry->router = new PsRouter($registry, isset($_GET['route']) ? $_GET['route'] : '');
+
+// Загружаем класс для работы с шаблонами
+$registry->view = new PsView($registry);
+
+// Выбираем нужный контроллер, определяем действие и выполняем
+$registry->router->delegate();
+
+// Отображаем вывод
+$registry->view->render();
