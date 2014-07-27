@@ -70,4 +70,8 @@ class PsConfigSection {
 
         return $this->_value->$name;
     }
+
+    public function toArray() {
+        return (array)$this->_value;
+    }
 }

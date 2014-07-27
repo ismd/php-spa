@@ -66,9 +66,9 @@ class PsRouter {
         $this->_registry = $registry;
         $this->_route    = $route;
 
-        $config = PsConfig::getInstance();
-        if (!empty($config->url_prefixes)) {
-            $this->_prefixes = $config->url_prefixes;
+        $urlPrefixed = PsConfig::getInstance()->url_prefixes->toArray();
+        if (!empty($urlPrefixed)) {
+            $this->_prefixes = $urlPrefixed;
         }
     }
 
@@ -256,9 +256,9 @@ class PsRouter {
             return '' == $this->_route ? self::INDEX_REQUEST : self::NON_SPA;
         }
 
-        if ($this->_prefix == $this->_prefixes->partial) {
+        if ($this->_prefix == $this->_prefixes['partial']) {
             return self::PARTIAL_REQUEST;
-        } elseif ($this->_prefix == $this->_prefixes->action) {
+        } elseif ($this->_prefix == $this->_prefixes['action']) {
             return self::ACTION_REQUEST;
         } else {
             return self::INDEX_REQUEST;
