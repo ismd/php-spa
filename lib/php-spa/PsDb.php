@@ -30,7 +30,7 @@ class PsDb extends PsSingleton {
             throw new Exception("Can't connect to database");
         }
 
-        $this->db->query('SET NAMES UTF8');
+        $this->db->set_charset('utf8');
     }
 
     public function __destruct() {
