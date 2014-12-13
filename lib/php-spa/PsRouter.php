@@ -121,6 +121,7 @@ class PsRouter {
         // Выполняем действие
         try {
             $controller->$action();
+        } catch (ActionFinishedException $e) {
         } catch (Exception $e) {
             $this->showErrorPage();
         }
@@ -177,7 +178,10 @@ class PsRouter {
         }
 
         // Выполняем действие
-        $controller->$action();
+        try {
+            $controller->$action();
+        } catch (ActionFinishedException $e) {
+        }
     }
 
     /**
@@ -264,4 +268,10 @@ class PsRouter {
             return self::INDEX_REQUEST;
         }
     }
+}
+
+/**
+ * Это исключение завершает работу действия (action)
+ */
+class ActionFinishedException extends Exception {
 }

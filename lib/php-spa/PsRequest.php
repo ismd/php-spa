@@ -25,7 +25,7 @@ class PsRequest extends PsSingleton {
      * @return boolean
      */
     public function isPost() {
-        return !empty($_POST);
+        return 'POST' == $_SERVER['REQUEST_METHOD'];
     }
 
     /**

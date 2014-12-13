@@ -51,4 +51,9 @@ abstract class PsController {
     protected function getArgs() {
         return $this->registry->router->getArgs();
     }
+
+    protected function getHelper($name) {
+        $name = ucfirst($name) . 'ActionHelper';
+        return new $name;
+    }
 }

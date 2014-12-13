@@ -40,6 +40,7 @@ class PsView extends PsObject {
     /**
      * Отображает страницу
      * @param string $partial Если передан параметр, то выводим заданный шаблон
+     * @throws ActionFinishedException
      * @throws Exception
      */
     public function render($partial = null) {
@@ -82,6 +83,7 @@ class PsView extends PsObject {
 
         require $filename;
         $this->_rendered = true;
+        throw new ActionFinishedException;
     }
 
     /**
@@ -120,10 +122,10 @@ class PsView extends PsObject {
      * Передача json-данных для вывода в шаблон
      * Можно использовать только при запросе действия
      * @param mixed[] $json
-     * @return PsView
+     * @throws ActionFinishedException
      */
     public function json($value) {
         $this->_json = (array)$value;
-        return $this;
+        throw new ActionFinishedException;
     }
 }

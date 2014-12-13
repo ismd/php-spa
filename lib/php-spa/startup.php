@@ -10,7 +10,7 @@ function __autoload($class) {
     }
 
     // Если класс движка
-    if (substr($class, 0, 2) == 'Ps') {
+    if ('Ps' == substr($class, 0, 2)) {
         $file = realpath(dirname(__FILE__)) . '/' . $class . '.php';
 
         if (is_readable($file)) {
@@ -29,8 +29,18 @@ function __autoload($class) {
     $filename = implode('/', $explodedClass) . '.php';
 
     // Если класс контроллера
-    if (substr($class, -9) == 'Controller') {
+    if ('Controller' == substr($class, -9)) {
         $file = APPLICATION_PATH . '/controllers/' . $filename;
+
+        if (is_readable($file)) {
+            require_once $file;
+            return;
+        }
+    }
+
+    // Если класс action helper'а
+    if ('ActionHelper' == substr($class, -12)) {
+        $file = APPLICATION_PATH . '/controllers/_helpers/' . substr($class, 0, -12) . '.php';
 
         if (is_readable($file)) {
             require_once $file;
@@ -87,4 +97,7 @@ $registry->view = new PsView($registry);
 $registry->router->delegate();
 
 // Отображаем вывод
-$registry->view->render();
+try {
+    $registry->view->render();
+} catch (ActionFinishedException $e) {
+}
