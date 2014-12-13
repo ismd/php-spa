@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Предоставляет доступ к данным запроса
  * @author ismd
  */
-
 class PsRequest extends PsSingleton {
 
     private $_post;

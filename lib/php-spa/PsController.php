@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Родительский класс для всех контроллеров
  * @author ismd
  */
-
 abstract class PsController {
 
     /**

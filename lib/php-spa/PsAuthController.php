@@ -1,10 +1,10 @@
 <?php
+
 /**
  * Родительский класс для контроллеров, которым необходимо,
  *   чтобы пользователь был авторизован
  * @author ismd
  */
-
 abstract class PsAuthController extends PsController {
 
     /**

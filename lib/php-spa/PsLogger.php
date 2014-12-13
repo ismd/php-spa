@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Класс для логирования
  * @author ismd
  */
-
 class PsLogger extends PsSingleton {
 
     private $_file;

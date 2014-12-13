@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Класс, предоставляющий доступ к БД
  * @author ismd
  */
-
 class PsDb extends PsSingleton {
 
     /**

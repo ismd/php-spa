@@ -1,8 +1,8 @@
 <?php
+
 /**
  * @author ismd
  */
-
 abstract class PsObject {
 
     /**

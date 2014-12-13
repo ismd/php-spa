@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Реализация singleton
  * @author ismd
  */
-
 abstract class PsSingleton {
 
     /**

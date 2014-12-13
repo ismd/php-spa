@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Класс, предоставляющий доступ к конфигам
  * @author ismd
  */
-
 class PsConfig extends PsSingleton {
 
     /**

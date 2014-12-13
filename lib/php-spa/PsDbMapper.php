@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Родительский класс для mapper'ов с подключением к БД
  * @author ismd
  */
-
 abstract class PsDbMapper extends PsMapper {
 
     /**

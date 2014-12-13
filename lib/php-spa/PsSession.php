@@ -1,9 +1,9 @@
 <?php
+
 /**
  * Реализация сессии с автоматической сериализацией
  * @author ismd
  */
-
 class PsSession extends PsObject {
 
     protected function __construct() {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Роутер
  *
@@ -18,7 +19,6 @@
  *
  * @author ismd
  */
-
 class PsRouter {
 
     const INDEX_REQUEST   = 1;

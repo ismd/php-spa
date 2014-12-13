@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Класс для работы с шаблонами
  *
@@ -10,7 +11,6 @@
  *
  * @author ismd
  */
-
 class PsView extends PsObject {
 
     protected $_registry;
