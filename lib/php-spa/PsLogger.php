@@ -7,13 +7,21 @@
 class PsLogger extends PsSingleton {
 
     private $_file;
+    private $_enabled;
 
     /**
      * @global PsRegistry $registry
      * @throws Exception
      */
     protected function __construct() {
-        $filename = PsConfig::getInstance()->log->filename;
+        $config = PsConfig::getInstance();
+        $this->_enabled = $config->log->enabled;
+
+        if (!$this->_enabled) {
+            return;
+        }
+
+        $filename = $config->log->filename;
 
         if (is_null($filename)) {
             throw new Exception('Log filename is empty');
@@ -36,6 +44,10 @@ class PsLogger extends PsSingleton {
      * @return PsLogger
      */
     public function log($data) {
+        if (!$this->_enabled) {
+            return $this;
+        }
+
         if (!is_string($data)) {
             $data = print_r($data, true);
         }
