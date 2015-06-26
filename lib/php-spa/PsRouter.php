@@ -193,7 +193,7 @@ class PsRouter {
         $route = explode('/', $this->_route);
 
         // Префикс
-        if (!is_null($this->_prefixes)) {
+        if (!is_null($this->_prefixes) && (count($route) > 1 || count($route) == 1 && !empty($route[0]))) {
             $this->_prefix = $route[0];
 
             if (!in_array($this->_prefix, $this->_prefixes)) {
