@@ -29,7 +29,7 @@ function __autoload($class) {
     $filename = implode('/', $explodedClass) . '.php';
 
     // Если класс контроллера
-    if ('Controller' == substr($class, -9)) {
+    if ('Controller' == substr($class, -10)) {
         $file = APPLICATION_PATH . '/controllers/' . $filename;
 
         if (is_readable($file)) {

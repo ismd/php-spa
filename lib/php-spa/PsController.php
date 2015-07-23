@@ -22,6 +22,11 @@ abstract class PsController {
     public function __construct(PsRegistry $registry) {
         $this->registry = $registry;
         $this->view     = $registry->view;
+
+        $this->init();
+    }
+
+    private function init() {
     }
 
     /**

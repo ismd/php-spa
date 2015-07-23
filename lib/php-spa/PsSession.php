@@ -6,7 +6,7 @@
  */
 class PsSession extends PsObject {
 
-    protected function __construct() {
+    public function __construct() {
         session_start();
 
         foreach ($_SESSION as $key => $value) {

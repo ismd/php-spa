@@ -35,9 +35,7 @@ class PsConfig extends PsSingleton {
 
         if (is_readable($filename)) {
             $config = $this->_parse($filename);
-        }
-
-        if (is_readable($filenameExample)) {
+        } elseif (is_readable($filenameExample)) {
             $config = $this->_parse($filenameExample, $config);
         }
 

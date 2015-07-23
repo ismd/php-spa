@@ -33,6 +33,11 @@ class PsView extends PsObject {
      */
     protected $_partial;
 
+    /**
+     * Имя layout'а
+     */
+    protected $_layout = 'layout';
+
     public function __construct($registry) {
         $this->_registry = $registry;
     }
@@ -75,7 +80,7 @@ class PsView extends PsObject {
         }
 
         // Отображаем главную страницу
-        $filename = APPLICATION_PATH . '/views/layout.phtml';
+        $filename = APPLICATION_PATH . '/views/' . $this->_layout . '.phtml';
 
         if (!is_readable($filename)) {
             throw new Exception('Layout not found');
@@ -127,5 +132,13 @@ class PsView extends PsObject {
     public function json($value) {
         $this->_json = (array)$value;
         throw new ActionFinishedException;
+    }
+
+    /**
+     * Устанавливает главный шаблон для вывода
+     * @param string $layout
+     */
+    public function setLayout($layout) {
+        $this->_layout = $layout;
     }
 }
