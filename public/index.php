@@ -1,6 +1,6 @@
 <?php
-// Определяем директорию с исходниками
-define('APPLICATION_PATH', realpath(dirname(__FILE__)) . '/../application');
+define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application/') . '/');
+define('PUBLIC_PATH', realpath(dirname(__FILE__) . '/../public/') . '/');
 
 set_include_path(implode(':', [
     realpath(APPLICATION_PATH . '/../lib'),

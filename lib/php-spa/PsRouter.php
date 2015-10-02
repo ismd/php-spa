@@ -64,7 +64,7 @@ class PsRouter {
 
     public function __construct($registry, $route) {
         $this->_registry = $registry;
-        $this->_route    = $route;
+        $this->_route    = trim($route, '/');
 
         $urlPrefixed = PsConfig::getInstance()->url_prefixes->toArray();
         if (!empty($urlPrefixed)) {

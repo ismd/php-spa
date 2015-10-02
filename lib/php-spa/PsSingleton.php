@@ -22,13 +22,14 @@ abstract class PsSingleton {
 
     /**
      * Возвращает инстанс запроса
+     * @param array $options
      * @return PsSingleton
      */
-    public static function getInstance() {
+    public static function getInstance($options = []) {
         $class = get_called_class();
 
         if (!isset(self::$_instances[$class])) {
-            self::$_instances[$class] = new $class;
+            self::$_instances[$class] = new $class($options);
         }
 
         return self::$_instances[$class];

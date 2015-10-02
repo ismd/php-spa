@@ -24,7 +24,7 @@ abstract class PsDbMapper extends PsMapper {
     /**
      * @return PsDbMapper
      */
-    public static function getInstance() {
-        return parent::getInstance();
+    public static function getInstance($options = []) {
+        return parent::getInstance($options);
     }
 }
