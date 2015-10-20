@@ -126,7 +126,7 @@ class PsView extends PsObject {
     /**
      * Передача json-данных для вывода в шаблон
      * Можно использовать только при запросе действия
-     * @param mixed[] $json
+     * @param mixed[] $value
      * @throws ActionFinishedException
      */
     public function json($value) {
@@ -140,5 +140,15 @@ class PsView extends PsObject {
      */
     public function setLayout($layout) {
         $this->_layout = $layout;
+    }
+
+    /**
+     * Возвращает инстанс view хелпера
+     * @param $name Название хелпера
+     * @return PsViewHelper
+     */
+    protected function getHelper($name) {
+        $name = ucfirst($name) . 'ViewHelper';
+        return new $name;
     }
 }

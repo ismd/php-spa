@@ -48,6 +48,16 @@ function __autoload($class) {
         }
     }
 
+    // Если класс view helper'а
+    if ('ViewHelper' == substr($class, -10)) {
+        $file = APPLICATION_PATH . '/views/_helpers/' . substr($class, 0, -10) . '.php';
+
+        if (is_readable($file)) {
+            require_once $file;
+            return;
+        }
+    }
+
     // Если класс модели
     $file = APPLICATION_PATH . '/models/' . $filename;
 

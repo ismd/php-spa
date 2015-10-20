@@ -57,6 +57,11 @@ abstract class PsController {
         return $this->registry->router->getArgs();
     }
 
+    /**
+     * Возвращает инстанс action хелпера
+     * @param $name Название хелпера
+     * @return PsActionHelper
+     */
     protected function getHelper($name) {
         $name = ucfirst($name) . 'ActionHelper';
         return new $name;
