@@ -161,7 +161,7 @@ class PsView extends PsObject {
      * @param $name Название хелпера
      * @return PsViewHelper
      */
-    protected function getHelper($name) {
+    public function getHelper($name) {
         $name = ucfirst($name) . 'ViewHelper';
         return new $name;
     }
