@@ -4,6 +4,12 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>php-spa</title>
+
+        <? foreach ($this->_meta as $property => $content): ?>
+            <meta name="<?= $property; ?>"
+                  property="<?= $property; ?>"
+                  content="<?= (empty($_SERVER['HTTPS']) || $_SERVER['HTTPS'] == 'off' ? 'http://' : 'https://') . $_SERVER['SERVER_NAME'] . $content; ?>" />
+        <? endforeach; ?>
     </head>
     <body>
         php-spa was successfully installed

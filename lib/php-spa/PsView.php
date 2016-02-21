@@ -28,6 +28,12 @@ class PsView extends PsObject {
     protected $_json = [];
 
     /**
+     * Meta тэги
+     * @var mixed[]
+     */
+    protected $_meta = [];
+
+    /**
      * Имя шаблона
      * @var string
      */
@@ -132,6 +138,14 @@ class PsView extends PsObject {
     public function json($value) {
         $this->_json = (array)$value;
         throw new ActionFinishedException;
+    }
+
+    /**
+     * Передача meta тэгов в шаблон
+     * @param mixed[] $value
+     */
+    public function meta($value) {
+        $this->_meta = (array)$value;
     }
 
     /**
