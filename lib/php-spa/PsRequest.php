@@ -31,8 +31,8 @@ class PsRequest extends PsSingleton {
     /**
      * @return PsRequest
      */
-    public static function getInstance() {
-        return parent::getInstance();
+    public static function getInstance($options = []) {
+        return parent::getInstance($options);
     }
 }
 

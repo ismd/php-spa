@@ -61,7 +61,7 @@ class PsLogger extends PsSingleton {
     /**
      * @return PsLogger
      */
-    public static function getInstance() {
-        return parent::getInstance();
+    public static function getInstance($options = []) {
+        return parent::getInstance($options);
     }
 }
