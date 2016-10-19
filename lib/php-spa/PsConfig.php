@@ -77,8 +77,8 @@ class PsConfig extends PsSingleton {
     /**
      * @return PsConfig
      */
-    public static function getInstance() {
-        return parent::getInstance();
+    public static function getInstance($options = []) {
+        return parent::getInstance($options);
     }
 }
 
