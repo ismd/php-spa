@@ -26,7 +26,7 @@ abstract class PsController {
         $this->init();
     }
 
-    private function init() {
+    public function init() {
     }
 
     /**
