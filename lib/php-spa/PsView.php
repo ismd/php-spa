@@ -25,7 +25,7 @@ class PsView extends PsObject {
      * JSON-данные для вывода при запросе действия
      * @var mixed[]
      */
-    protected $_json = [];
+    protected $_json = null;
 
     /**
      * Meta тэги
@@ -60,26 +60,35 @@ class PsView extends PsObject {
         }
 
         $this->_partial = $partial;
-        header('Content-Type: text/html; charset=utf-8');
 
         if (is_null($partial)) {
             switch ($this->_registry->router->getRequestType()) {
                 case PsRouter::PARTIAL_REQUEST:
+                    header('Content-Type: text/html; charset=utf-8');
                     $this->content();
                     return;
 
                 case PsRouter::ACTION_REQUEST:
+                    if (is_null($this->_json)) {
+                        header('Content-Type: application/json; charset=utf-8');
+                        $this->content();
+                        return;
+                    }
+
+                    header('Content-Type: application/json; charset=utf-8');
                     echo json_encode($this->_json);
                     return;
 
                 case PsRouter::NON_SPA:
                     if (!empty($this->_json)) {
+                        header('Content-Type: application/json; charset=utf-8');
                         echo json_encode($this->_json);
                         return;
                     }
             }
 
             if (!empty($this->_json)) {
+                header('Content-Type: application/json; charset=utf-8');
                 echo json_encode($this->_json);
                 return;
             }
