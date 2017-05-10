@@ -22,7 +22,7 @@ abstract class PsSingleton {
 
     /**
      * Возвращает инстанс запроса
-     * @param array $options
+     * @param mixed[] $options
      * @return PsSingleton
      */
     public static function getInstance($options = []) {

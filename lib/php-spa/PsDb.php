@@ -38,9 +38,10 @@ class PsDb extends PsSingleton {
     }
 
     /**
+     * @param mixed[] $options
      * @return PsDb
      */
-    public static function getInstance() {
+    public static function getInstance($options = []) {
         return parent::getInstance();
     }
 }
