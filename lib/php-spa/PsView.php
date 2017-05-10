@@ -70,7 +70,8 @@ class PsView extends PsObject {
 
                 case PsRouter::ACTION_REQUEST:
                     if (is_null($this->_json)) {
-                        header('Content-Type: application/json; charset=utf-8');
+                        header('Content-Type: text/html; charset=utf-8');
+                        http_response_code(404);
                         $this->content();
                         return;
                     }
@@ -95,6 +96,7 @@ class PsView extends PsObject {
         }
 
         // Отображаем главную страницу
+        header('Content-Type: text/html; charset=utf-8');
         $filename = APPLICATION_PATH . '/views/' . $this->_layout . '.phtml';
 
         if (!is_readable($filename)) {
