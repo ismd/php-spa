@@ -240,6 +240,27 @@ class PsRouter {
     }
 
     /**
+     * Возвращает часть url, соответствующую контроллеру
+     * @return string
+     */
+    public function getControllerUrlPart() {
+        $route = explode('/', $this->_route);
+
+        // Префикс
+        if (!is_null($this->_prefixes) && (count($route) > 1 || count($route) == 1 && !empty($route[0]))) {
+            if (!in_array($this->_prefix, $this->_prefixes)) {
+                return 'index';
+            }
+
+            $controllerId = 1;
+        } else {
+            $controllerId = 0;
+        }
+
+        return '' != $route[$controllerId] ? $route[$controllerId] : 'index';
+    }
+
+    /**
      * Возвращает действие
      * @return string
      */
