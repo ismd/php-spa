@@ -208,7 +208,13 @@ class PsRouter {
         }
 
         // Контроллер
-        $this->_controller = '' != $route[$controllerId] ? ucfirst(strtolower($route[$controllerId])) : 'Index';
+        if ('' != $route[$controllerId]) {
+            $this->_controller = implode(array_map(function($part) {
+                return ucfirst(strtolower($part));
+            }, explode('-', $route[$controllerId])));
+        } else {
+            $this->_controller = 'Index';
+        }
 
         // Действие
         if (count($route) > $controllerId + 1) {
